@@ -1,0 +1,26 @@
+package zombie_crush_saga.event;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import zombie_crush_saga.ui.ZombieCrushSagaPanel;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ScrollUpLevelScreenHandler implements ActionListener
+{
+    //panel
+    ZombieCrushSagaPanel mypanel;
+    public ScrollUpLevelScreenHandler(ZombieCrushSagaMiniGame aThis) 
+    {
+        mypanel = new ZombieCrushSagaPanel();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) 
+    {
+        
+    }
+}

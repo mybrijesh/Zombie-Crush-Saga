@@ -1,0 +1,188 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.data;
+
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import mini_game.MiniGame;
+import mini_game.MiniGameDataModel;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import zombie_crush_saga.ui.ZombieCrushSagaTiles;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaDataModel extends MiniGameDataModel
+{
+    // THIS CLASS HAS A REFERERENCE TO THE MINI GAME SO THAT IT
+    // CAN NOTIFY IT TO UPDATE THE DISPLAY WHEN THE DATA MODEL CHANGES
+    private MiniGame miniGame;
+    private ZombieCrushSagaMiniGame game;
+    
+    // THE LEVEL GRID REFERS TO THE LAYOUT FOR A GIVEN LEVEL, MEANING
+    // HOW MANY TILES FIT INTO EACH CELL WHEN FIRST STARTING A LEVEL
+    private int[][] levelGrid;
+    
+    // LEVEL GRID DIMENSIONS
+    private int gridColumns;
+    private int gridRows;
+    
+    // THIS STORES THE TILES ON THE GRID DURING THE GAME
+    private ArrayList<ZombieCrushSagaTiles>[][] tileGrid;
+    
+    // THESE ARE THE TILES THE PLAYER HAS MATCHED
+    private ArrayList<ZombieCrushSagaTiles> stackTiles;
+    
+    // THESE ARE THE TILES THAT ARE MOVING AROUND, AND SO WE HAVE TO UPDATE
+    private ArrayList<ZombieCrushSagaTiles> movingTiles;
+    
+    // THIS IS A SELECTED TILE, MEANING THE FIRST OF A PAIR THE PLAYER
+    // IS TRYING TO MATCH. THERE CAN ONLY BE ONE OF THESE AT ANY TIME
+    private ZombieCrushSagaTiles selectedTile;
+    
+    // THE INITIAL LOCATION OF TILES BEFORE BEING PLACED IN THE GRID
+    private int unassignedTilesX;
+    private int unassignedTilesY;
+    
+    // THESE ARE USED FOR TIMING THE GAME
+    private GregorianCalendar startTime;
+    private GregorianCalendar endTime;
+    
+    // THE REFERENCE TO THE FILE BEING PLAYED
+    private String currentLevel;
+    
+    public ZombieCrushSagaDataModel(ZombieCrushSagaMiniGame aThis) 
+    {
+       
+    }
+
+    @Override
+    public void checkMousePressOnSprites(MiniGame game, int x, int y) 
+    {
+       
+    }
+
+    @Override
+    public void reset(MiniGame game) 
+    {
+        
+    }
+
+    @Override
+    public void updateAll(MiniGame game) 
+    {
+       // MAKE SURE THIS THREAD HAS EXCLUSIVE ACCESS TO THE DATA
+        try
+        {
+            game.beginUsingData();
+        
+            // WE ONLY NEED TO UPDATE AND MOVE THE MOVING TILES
+            for (int i = 0; i < movingTiles.size(); i++)
+            {
+                // GET THE NEXT TILE
+                ZombieCrushSagaTiles tile = movingTiles.get(i);
+            
+                // THIS WILL UPDATE IT'S POSITION USING ITS VELOCITY
+                tile.update(game);
+            
+                // IF IT'S REACHED ITS DESTINATION, REMOVE IT
+                // FROM THE LIST OF MOVING TILES
+                if (!tile.isMovingToTarget())
+                {
+                    movingTiles.remove(tile);
+                }
+            }
+        
+            // IF THE GAME IS STILL ON, THE TIMER SHOULD CONTINUE
+            if (inProgress())
+            {
+                // KEEP THE GAME TIMER GOING IF THE GAME STILL IS
+                endTime = new GregorianCalendar();
+            }
+        }
+        finally
+        {
+            // MAKE SURE WE RELEASE THE LOCK WHETHER THERE IS
+            // AN EXCEPTION THROWN OR NOT
+            game.endUsingData();
+        }
+    }
+
+    @Override
+    public void updateDebugText(MiniGame game) 
+    {
+     
+    }
+
+    public void initLevelGrid(int[][] initGrid, int initGridColumns, int initGridRows) 
+    {
+        levelGrid = initGrid;
+        gridColumns = initGridColumns;
+        gridRows = initGridRows;
+        
+        tileGrid = new ArrayList[gridColumns][gridRows];
+        for(int i = 0; i<gridColumns;i++)
+        {
+            for(int j=0;j<gridRows;j++)
+            {
+                tileGrid[i][j] = new ArrayList();
+            }
+        }
+        enableTiles(true);
+    }
+
+    public void setCurrentLevel(String levelName) 
+    {
+        currentLevel = levelName;
+    }
+
+    private void enableTiles(boolean b) 
+    {
+        moveAllTilesToStack();
+        
+        for(ZombieCrushSagaTiles tile : stackTiles)
+        {
+            if(b)
+                tile.setState(VISIBLE_STATE);
+            else
+                tile.setState(INVISIBLE_STATE);
+        }
+    }
+
+    private void moveAllTilesToStack() 
+    {
+        for(int i =0; i<gridColumns; i++)
+        {
+            for(int j=0;j<gridRows;j++)
+            {
+                ArrayList<ZombieCrushSagaTiles> cellStack = tileGrid[i][j];
+                moveTiles(cellStack, stackTiles);
+            }
+        }
+    }
+
+    private void moveTiles(ArrayList<ZombieCrushSagaTiles> from, ArrayList<ZombieCrushSagaTiles> to) 
+    {
+        for(int i =from.size()-1;i >= 0; i--)
+        {
+            ZombieCrushSagaTiles tile = from.remove(i);
+            if(!to.contains(tile))
+                to.add(tile);
+        }
+    }
+
+    public int getGridColumns() 
+    {
+        return gridColumns;
+    }
+    public int getGridRows()
+    {
+        return gridRows;
+    }
+   
+}

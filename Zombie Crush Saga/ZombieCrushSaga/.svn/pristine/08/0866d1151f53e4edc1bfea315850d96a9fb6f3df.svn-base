@@ -1,0 +1,100 @@
+
+package zombie_crush_saga.ui;
+
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import mini_game.MiniGame;
+import mini_game.Sprite;
+import mini_game.SpriteType;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaMiniGame extends MiniGame
+{
+    private ZombieCrushSagaErrorHandler errorHandler;
+    
+    String currentScreenState;
+    /*
+     * Override Methods for MiniGame
+     * initAudioContent
+     * initData
+     * initGUIControls
+     * initGUIHandlers
+     * reset
+     * updateGUI
+     */
+    @Override
+    public void initAudioContent() 
+    {
+       
+    }
+
+    @Override
+    public void initData() 
+    {
+       
+    }
+
+    @Override
+    public void initGUIControls() 
+    {
+        
+    }
+
+    @Override
+    public void initGUIHandlers() 
+    {
+      
+    }
+
+    @Override
+    public void reset() 
+    {
+        
+    }
+
+    @Override
+    public void updateGUI() 
+    {
+      
+    }
+     /**
+     * Accessor method for getting the application's error handler.
+     * 
+     * @return The error handler.
+     */
+    public ZombieCrushSagaErrorHandler getErrorHandler() 
+    {
+        return errorHandler;
+    }
+    
+     /**
+     * This method switches the application to the splash screen, making
+     * all the appropriate UI controls visible & invisible.
+     */    
+    public void switchToSplashScreen()
+    {
+
+    }
+    /**
+     * Used for testing to see if the current screen state matches
+     * the testScreenState argument. If it mates, true is returned,
+     * else false.
+     * 
+     * @param testScreenState Screen state to test against the 
+     * current state.
+     * 
+     * @return true if the current state is testScreenState, false otherwise.
+     */
+    public boolean isCurrentScreenState(String testScreenState)
+    {
+        return false;
+        
+    }
+}

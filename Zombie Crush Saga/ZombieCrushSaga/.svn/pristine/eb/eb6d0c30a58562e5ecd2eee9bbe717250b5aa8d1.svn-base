@@ -1,0 +1,22 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.ui;
+
+import javax.swing.JPanel;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaPanel extends JPanel
+{
+
+    ZombieCrushSagaPanel(ZombieCrushSagaMiniGame initGame, ZombieCrushSagaDataModel initData) 
+    {
+        
+    }
+    
+}

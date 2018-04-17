@@ -1,0 +1,38 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class LevelHandler implements ActionListener
+{
+    ZombieCrushSagaMiniGame miniGame;
+    public LevelHandler(ZombieCrushSagaMiniGame initGame) 
+    {
+        miniGame = initGame;    
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) 
+    {
+        String whatButton = ae.getActionCommand();
+        if(whatButton.equals(GAME_SCREEN_LEVEL_SCORE_BUTTON_TYPE))
+        {
+            miniGame.swithToLevelScoreScreen();
+        }
+        else if(whatButton.equals(LEVEL_1_BUTTON_TYPE))
+        {
+            miniGame.swithToLevelScoreScreen();
+        }
+    }
+    
+}

@@ -1,0 +1,31 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.ui;
+
+import mini_game.MiniGame;
+import mini_game.Sprite;
+import mini_game.SpriteType;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaTiles extends Sprite
+{
+    public ZombieCrushSagaTiles(    SpriteType initSpriteType,
+                                    float initX, 	float initY,
+                                    float initVx, 	float initVy,
+                                    String initState,   String initTileType)
+    {
+        // SEND ALL THE Sprite DATA TO A Sprite CONSTRUCTOR
+        super(initSpriteType, initX, initY, initVx, initVy, initState);
+    }
+    
+    @Override
+    public void update(MiniGame game)
+    {
+        
+    }
+}

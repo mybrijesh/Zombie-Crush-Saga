@@ -1,0 +1,25 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.file;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaFileManager 
+{
+    // WE'LL LET THE GAME KNOW WHEN DATA LOADING IS COMPLETE
+    private ZombieCrushSagaMiniGame miniGame;
+    
+    public ZombieCrushSagaFileManager(ZombieCrushSagaMiniGame initMiniGame) 
+    {
+        // KEEP IT FOR LATER
+        miniGame = initMiniGame;       
+    }
+    
+}

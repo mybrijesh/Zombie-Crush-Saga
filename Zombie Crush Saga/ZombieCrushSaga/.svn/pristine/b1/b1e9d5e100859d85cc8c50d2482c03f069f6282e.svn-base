@@ -1,0 +1,182 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+import zombie_crush_saga.file.ZombieCrushSagaFileManager;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class LevelHandler implements ActionListener
+{
+    ZombieCrushSagaMiniGame miniGame;
+    String levelFile;
+    
+    public LevelHandler(ZombieCrushSagaMiniGame initGame) 
+    {
+        miniGame = initGame;   
+        levelFile = "";
+    }
+//    public String getCurrentLevel()
+//    {
+//        return currentLevel;
+//    }
+    @Override
+    public void actionPerformed(ActionEvent ae) 
+    {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(ZombieCrushSagaPropertyType.DATA_PATH);
+        ArrayList<String> levels = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.LEVEL_OPTIONS);
+    
+        //checking first if button was pressed form inside the current game 
+        //playing
+        String whatButton = ae.getActionCommand();
+        if(whatButton.equals(GAME_SCREEN_END_GAME_BUTTON_TYPE))
+        {
+            if(miniGame.getDataModel().inProgress())
+            {
+                miniGame.getDataModel().endGameAsLoss();
+            }
+            miniGame.getCanvas().setCursor(Cursor.getDefaultCursor());
+            miniGame.swithToLevelScoreScreen();
+        }
+        //checking which level button got pressed and loading the properties accordingly
+       if(miniGame.isCurrentScreenState(LEVEL_SCREEN_STATE))
+        {
+            switch (whatButton) 
+            {
+                case LEVEL_1_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(0);
+                    break;
+                case LEVEL_2_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(1);
+                    break;
+                case LEVEL_3_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(2);
+                    break;
+                case LEVEL_4_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(3);
+                    break;
+                case LEVEL_5_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(4);
+                    break;
+                case LEVEL_6_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(5);
+                    break;
+                case LEVEL_7_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(6);
+                    break;
+                case LEVEL_8_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(7);
+                    break;
+                case LEVEL_9_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(8);
+                    break;
+                case LEVEL_10_BUTTON_TYPE:
+                    levelFile = dataPath+levels.get(9);
+                    break;
+            }
+            if(whatButton.equals(LEVEL_11_BUTTON_TYPE))
+            {
+                //currently we will do nothing 
+            }
+            else
+            {
+                loadingLevel();
+            }
+            
+        }
+        
+    }
+    public void loadingLevel()
+    {
+        //get the game's data model, which is alredy locked for us to use
+        ZombieCrushSagaDataModel data = (ZombieCrushSagaDataModel)miniGame.getDataModel();
+        
+        //update the data
+        ZombieCrushSagaFileManager fileManager = miniGame.getFileManager();
+        fileManager.loadLevel(levelFile);
+        alsoupdateJellyGrid();
+        data.setUpScoring();
+        miniGame.swithToLevelScoreScreen();
+    }
+    public void LevelHandlerSwithToLevelScoreScreen(String currentLevel)
+    {
+        levelFile = currentLevel;
+        loadingLevel();
+    }
+    public void alsoupdateJellyGrid()
+    {
+        //get the game's data model, which is alredy locked for us to use
+        ZombieCrushSagaDataModel data = (ZombieCrushSagaDataModel)miniGame.getDataModel();
+        ZombieCrushSagaFileManager fileManager = miniGame.getFileManager();
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(ZombieCrushSagaPropertyType.DATA_PATH);
+        ArrayList<String> levels = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.LEVEL_JELLY_OPTIONS);
+        if("Level1".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(0));
+            data.printLevelJellyGrid();
+        }
+        else if("Level2".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(1));
+            data.printLevelJellyGrid();
+        }
+        else if("Level3".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(2));
+            data.printLevelJellyGrid();
+        }
+        else if("Level4".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(3));
+            data.printLevelJellyGrid();
+        }
+        else if("Level5".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(4));
+            data.printLevelJellyGrid();
+        }
+        else if("Level6".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(5));
+            data.printLevelJellyGrid();
+        }
+        else if("Level7".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(6));
+            data.printLevelJellyGrid();
+        }
+        else if("Level8".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(7));
+            data.printLevelJellyGrid();
+        }
+        else if("Level9".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(8));
+            data.printLevelJellyGrid();
+        }
+        else if("Level10".equals(data.getLevelName()))
+        {
+            fileManager.loadJellyLevel(dataPath+levels.get(9));
+            data.printLevelJellyGrid();
+        }
+        
+    }
+    
+}

@@ -1,0 +1,351 @@
+
+package zombie_crush_saga.ui;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import mini_game.MiniGame;
+import mini_game.Sprite;
+import mini_game.SpriteType;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+import zombie_crush_saga.data.ZombieCrushSagaRecord;
+import zombie_crush_saga.event.ExitHandler;
+import zombie_crush_saga.event.GamePlayHandler;
+import zombie_crush_saga.event.ScrollDownLevelScreenHandler;
+import zombie_crush_saga.event.ScrollUpLevelScreenHandler;
+import zombie_crush_saga.file.ZombieCrushSagaFileManager;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaMiniGame extends MiniGame
+{
+    //HANDLES ERROR CONDITIONS
+    private ZombieCrushSagaErrorHandler errorHandler;
+    
+    //MANAGES LOADING OF LEVELS AND THE PLAYE RECORDS FILE
+    private ZombieCrushSagaFileManager fileManager;
+    
+    //THE PLAYER RECORD FOR EACH LEVEL, WHICH LIVES BEYONG ONE SESSION
+    private ZombieCrushSagaRecord record;
+    
+    //THE SCREEN CURRENTLY BEING PLAYED
+    String currentScreenState;
+    
+    /*
+     * Override Methods for MiniGame
+     * initAudioContent
+     * initData
+     * initGUIControls
+     * initGUIHandlers
+     * reset
+     * updateGUI
+     */
+    @Override
+    public void initAudioContent() 
+    {
+       //WE HAVE NO AUDIO IN THIS GAME
+    }
+
+    @Override
+    public void initData() 
+    {
+       // INIT OUR ERROR HANDLER
+        errorHandler = new ZombieCrushSagaErrorHandler(window);
+        
+        // INIT OUR FILE MANAGER
+        fileManager = new ZombieCrushSagaFileManager(this);
+
+//        // LOAD THE PLAYER'S RECORD FROM A FILE
+//        record = fileManager.loadRecord();
+        
+        // INIT OUR DATA MANAGER
+        data = new ZombieCrushSagaDataModel(this);
+
+        // LOAD THE GAME DIMENSIONS
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        int gameWidth = Integer.parseInt(props.getProperty(ZombieCrushSagaPropertyType.GAME_WIDTH.toString()));
+        int gameHeight = Integer.parseInt(props.getProperty(ZombieCrushSagaPropertyType.GAME_HEIGHT.toString()));
+        data.setGameDimensions(gameWidth, gameHeight);
+
+        // THIS WILL CHANGE WHEN WE LOAD A LEVEL
+        boundaryLeft = Integer.parseInt(props.getProperty(ZombieCrushSagaPropertyType.GAME_LEFT_OFFSET.toString()));
+        boundaryTop = Integer.parseInt(props.getProperty(ZombieCrushSagaPropertyType.GAME_TOP_OFFSET.toString()));
+        boundaryRight = gameWidth - boundaryLeft;
+        boundaryBottom = gameHeight;
+    }
+
+    @Override
+    public void initGUIControls() 
+    {
+        // WE'LL USE AND REUSE THESE FOR LOADING STUFF
+        BufferedImage img;
+        float x, y;
+        SpriteType sT;
+        Sprite s;
+ 
+        // FIRST PUT THE ICON IN THE WINDOW
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String imgPath = props.getProperty(ZombieCrushSagaPropertyType.IMG_PATH);        
+        String windowIconFile = props.getProperty(ZombieCrushSagaPropertyType.WINDOW_ICON);
+        img = loadImage(imgPath + windowIconFile);
+        window.setIconImage(img);
+
+        // CONSTRUCT THE PANEL WHERE WE'LL DRAW EVERYTHING
+        canvas = new ZombieCrushSagaPanel(this, (ZombieCrushSagaDataModel)data);
+        
+        // LOAD THE BACKGROUNDS, WHICH ARE GUI DECOR
+        currentScreenState = SPLASH_SCREEN_STATE;
+        img = loadImage(imgPath + props.getProperty(ZombieCrushSagaPropertyType.SPLASH_SCREEN_IMAGE_NAME));
+        sT = new SpriteType(BACKGROUND_TYPE);
+        sT.addState(SPLASH_SCREEN_STATE, img);
+        img = loadImage(imgPath + props.getProperty(ZombieCrushSagaPropertyType.LEVEL_SCREEN_IMAGE_NAME));
+        sT.addState(LEVEL_SCREEN_STATE, img);
+        img = loadImage(imgPath + props.getProperty(ZombieCrushSagaPropertyType.GAME_BACKGROUND_IMAGE_NAME));
+        sT.addState(GAME_SCREEN_STATE, img);
+        s = new Sprite(sT, 0, 0, 0, 0, SPLASH_SCREEN_STATE);
+        guiDecor.put(BACKGROUND_TYPE, s);
+        
+        //PUT THE GAME PLAY BUTTON ON SPLASH SCREEN
+        String gameplay_button = props.getProperty(ZombieCrushSagaPropertyType.GAMEPLAY_BUTTON_IMAGE_NAME);
+        sT = new SpriteType(GAMEPLAY_BUTTON_TYPE);
+        img = loadImage(imgPath + gameplay_button);
+        sT.addState(VISIBLE_STATE, img);
+        String gameplay_button_mouseover = props.getProperty(ZombieCrushSagaPropertyType.GAMEPLAY_BUTTON_MOUSE_OVER_IMAGE_NAME);
+        img = loadImage(imgPath + gameplay_button_mouseover);
+        sT.addState(MOUSE_OVER_STATE, img);
+        s = new Sprite(sT, GAMEPLAY_BUTTON_X, GAMEPLAY_BUTTON_Y, 0, 0 , VISIBLE_STATE);
+        guiButtons.put(GAMEPLAY_BUTTON_TYPE, s);
+        
+        //PUT THE GAME RESET BUTTON ON SPLASH SCREEN
+        String gamereset_button = props.getProperty(ZombieCrushSagaPropertyType.GAMERESET_BUTTON_IMAGE_NAME);
+        sT = new SpriteType(GAMERESET_BUTTON_TYPE);
+        img = loadImage(imgPath + gamereset_button);
+        sT.addState(VISIBLE_STATE, img);
+        String gamereset_button_mouseover = props.getProperty(ZombieCrushSagaPropertyType.GAMERESET_BUTTON_MOUSE_OVER_IMAGE_NAME);
+        img = loadImage(imgPath + gamereset_button_mouseover);
+        sT.addState(MOUSE_OVER_STATE, img);
+        s = new Sprite(sT, GAMERESET_BUTTON_X, GAMERESET_BUTTON_Y, 0, 0 , VISIBLE_STATE);
+        guiButtons.put(GAMERESET_BUTTON_TYPE, s);
+        
+        //PUT THE GAME QUIT BUTTON ON SPLASH SCREEN
+        String gamequit_button = props.getProperty(ZombieCrushSagaPropertyType.GAMEQUIT_BUTTON_IMAGE_NAME);
+        sT = new SpriteType(GAMEQUIT_BUTTON_TYPE);
+        img = loadImage(imgPath + gamequit_button);
+        sT.addState(VISIBLE_STATE, img);
+        String gamequit_button_mouseover = props.getProperty(ZombieCrushSagaPropertyType.GAMEQUIT_BUTTON_MOUSE_OVER_IMAGE_NAME);
+        img = loadImage(imgPath + gamequit_button_mouseover);
+        sT.addState(MOUSE_OVER_STATE, img);
+        s = new Sprite(sT, GAMEQUIT_BUTTON_X, GAMEQUIT_BUTTON_Y, 0, 0 , VISIBLE_STATE);
+        guiButtons.put(GAMEQUIT_BUTTON_TYPE, s);
+        
+        
+        //PUT THE SCROLL UP ARROUW ON LEVEL SCREEN
+        String scrollUp_button = props.getProperty(ZombieCrushSagaPropertyType.ARROWUP_BUTTON_IMAGE_NAME);
+        sT = new SpriteType(SCROLLUP_BUTTON_TYPE);
+        img = loadImage(imgPath + scrollUp_button);
+        sT.addState(VISIBLE_STATE, img);
+        String scrollUp_button_mouseover = props.getProperty(ZombieCrushSagaPropertyType.ARROWUP_BUTTON_MOUSE_OVER_IMAGE_NAME);
+        img = loadImage(imgPath + scrollUp_button_mouseover);
+        sT.addState(MOUSE_OVER_STATE, img);
+        s = new Sprite(sT, ARROWUP_BUTTON_X, ARROWUP_BUTTON_Y, 0, 0, INVISIBLE_STATE);
+        guiButtons.put(SCROLLUP_BUTTON_TYPE, s);
+        
+        //PUT THE SCROLL DOWN ARROUW ON LEVEL SCREEN
+        String scrollDown = props.getProperty(ZombieCrushSagaPropertyType.ARROWDOWN_BUTTON_IMAGE_NAME);
+        sT = new SpriteType(SCROLLUP_BUTTON_TYPE);
+        img = loadImage(imgPath + scrollDown);
+        sT.addState(VISIBLE_STATE, img);
+        String scrollDown_button_mouseover = props.getProperty(ZombieCrushSagaPropertyType.ARROWDOWN_BUTTON_MOUSE_OVER_IMAGE_NAME);
+        img = loadImage(imgPath + scrollDown_button_mouseover);
+        sT.addState(MOUSE_OVER_STATE, img);
+        s = new Sprite(sT, ARROWDOWN_BUTTON_X, ARROWDOWN_BUTTON_Y, 0, 0, INVISIBLE_STATE);
+        guiButtons.put(SCROLLDOWN_BUTTON_TYPE, s);
+    }
+
+    @Override
+    public void initGUIHandlers() 
+    {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(ZombieCrushSagaPropertyType.DATA_PATH);
+        
+        //WE'LL HAVE A CUSTOM RESPNSE FOR WHEN USER CLOSES THE WINDOW
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ExitHandler eh = new ExitHandler(this);
+        
+        //GAME QUIT EVENT HANDLER
+        ExitHandler geh = new ExitHandler(this);
+        guiButtons.get(GAMEQUIT_BUTTON_TYPE).setActionListener(geh);
+        
+        //GAME PLAY EVENT HANDLER
+        GamePlayHandler gp = new GamePlayHandler(this);
+        guiButtons.get(GAMEPLAY_BUTTON_TYPE).setActionListener(gp);
+        
+        //SCROLL UP LEVEL SCREEN
+        ScrollUpLevelScreenHandler sulsh = new ScrollUpLevelScreenHandler(this);
+        guiButtons.get(SCROLLUP_BUTTON_TYPE).setActionListener(sulsh);
+        
+        //SCROLL DOWN LEVEL SCREEN
+        ScrollDownLevelScreenHandler sdlsh = new ScrollDownLevelScreenHandler(this);
+        guiButtons.get(SCROLLDOWN_BUTTON_TYPE).setActionListener(sdlsh);
+    }
+
+    @Override
+    public void reset() 
+    {
+        data.reset(this);
+    }
+
+    @Override
+    public void updateGUI() 
+    {
+        // GO THROUGH THE VISIBLE BUTTONS TO TRIGGER MOUSE OVERS
+        Iterator<Sprite> buttonsIt = guiButtons.values().iterator();
+        while (buttonsIt.hasNext())
+        {
+            Sprite button = buttonsIt.next();
+            
+            // ARE WE ENTERING A BUTTON?
+            if (button.getState().equals(VISIBLE_STATE))
+            {
+                if (button.containsPoint(data.getLastMouseX(), data.getLastMouseY()))
+                {
+                    button.setState(MOUSE_OVER_STATE);
+                }
+            }
+            // ARE WE EXITING A BUTTON?
+            else if (button.getState().equals(MOUSE_OVER_STATE))
+            {
+                 if (!button.containsPoint(data.getLastMouseX(), data.getLastMouseY()))
+                {
+                    button.setState(VISIBLE_STATE);
+                }
+            }
+        }
+    }
+    
+    /*
+     *ACCESSOR METHODS
+     * 
+     * getErrorHandler
+     * getPlayerRecord
+     * getFileManager
+     * isCurrentScreenState
+     * 
+     */
+     /**
+     * Accessor method for getting the application's error handler.
+     * 
+     * @return The error handler.
+     */
+    
+    public ZombieCrushSagaErrorHandler getErrorHandler() 
+    {
+        return errorHandler;
+    }
+     /**
+     * Accessor method for getting the player record object, which
+     * summarizes the player's record on all levels.
+     * 
+     * @return The player's complete record.
+     */
+    
+    public ZombieCrushSagaRecord getPlayerRecord() 
+    { 
+        return record; 
+    }
+    /**
+     * Used for testing to see if the current screen state matches
+     * the testScreenState argument. If it mates, true is returned,
+     * else false.
+     * 
+     * @param testScreenState Screen state to test against the 
+     * current state.
+     * 
+     * @return true if the current state is testScreenState, false otherwise.
+     */
+    
+    public boolean isCurrentScreenState(String testScreenState)
+    {
+        return testScreenState.equals(currentScreenState);
+    }
+    
+    /**
+     * Accessor method for getting the app's file manager.
+     * 
+     * @return The file manager.
+     */
+    public ZombieCrushSagaFileManager getFileManager()
+    {
+        return fileManager;
+    }
+    
+    /*
+     * ALL SCREEN SWTICH METHOD
+     * 
+     * switchToSplashScreen
+     * swithToLevelScreen
+     * swithToGameScreen
+     * 
+     */
+     /**
+     * This method switches the application to the splash screen, making
+     * all the appropriate UI controls visible & invisible.
+     */    
+    public void switchToSplashScreen()
+    {
+
+    }
+    
+    /*
+     * This method switches the application to the level screen, making 
+     * all the appropriate UI controls visible & invisible.
+     */
+    public void swithToLevelScreen()
+    {
+        System.out.println("6");
+        //CHANGE THE BACKGROUND
+        guiDecor.get(BACKGROUND_TYPE).setState(LEVEL_SCREEN_STATE);
+        //MAKE THE CURRENT SCREEN THE LEVEL SCREEN
+        System.out.println("7");
+        currentScreenState = LEVEL_SCREEN_STATE;
+        System.out.println("8");
+        
+        //DEACTIVATE THE SPLASH SCREEN BUTTONS
+        guiButtons.get(GAMEPLAY_BUTTON_TYPE).setState(INVISIBLE_STATE);
+        guiButtons.get(GAMERESET_BUTTON_TYPE).setState(INVISIBLE_STATE);
+        guiButtons.get(GAMEQUIT_BUTTON_TYPE).setState(INVISIBLE_STATE);
+        System.out.println("9");
+        //ACTIVATE THE ARROW UP AND ARROW DOWN BUTTONS
+        guiButtons.get(SCROLLUP_BUTTON_TYPE).setState(VISIBLE_STATE);
+        guiButtons.get(SCROLLDOWN_BUTTON_TYPE).setState(VISIBLE_STATE);
+        System.out.println("10");
+    }
+    
+    /*
+     * This method switches the application to Game Playing Screen, making
+     * all the appropriate UI controls visible * invisible.
+     */
+    
+    public void swithToGameScreen()
+    {
+        
+    }
+    
+    /**
+     * This method updates the game grid boundaries, which will depend
+     * on the level loaded.
+     */    
+    public void updateBoundaries()
+    {
+       
+    }
+}

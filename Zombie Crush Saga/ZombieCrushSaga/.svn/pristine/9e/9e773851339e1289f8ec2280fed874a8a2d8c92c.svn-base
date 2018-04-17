@@ -1,0 +1,72 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+import zombie_crush_saga.file.ZombieCrushSagaFileManager;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class LevelHandler implements ActionListener
+{
+    ZombieCrushSagaMiniGame miniGame;
+    String levelFile;
+    
+    public LevelHandler(ZombieCrushSagaMiniGame initGame) 
+    {
+        miniGame = initGame;   
+        levelFile = "";
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) 
+    {
+        //checking first if button was pressed form inside the current game 
+        //playing
+        String whatButton = ae.getActionCommand();
+        if(whatButton.equals(GAME_SCREEN_LEVEL_SCORE_BUTTON_TYPE))
+        {
+            miniGame.swithToLevelScoreScreen();
+        }
+        //checking which level button got pressed and loading the properties accordingly
+       if(miniGame.isCurrentScreenState(LEVEL_SCREEN_STATE))
+        {
+            PropertiesManager props = PropertiesManager.getPropertiesManager();
+            String dataPath = props.getProperty(ZombieCrushSagaPropertyType.DATA_PATH);
+            ArrayList<String> levels = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.LEVEL_OPTIONS);
+      
+            if(whatButton.equals(LEVEL_1_BUTTON_TYPE))
+            {
+               
+                levelFile = dataPath+levels.get(0);
+            }
+            loadingLevel();
+//             miniGame.swithToLevelScoreScreen();
+        }
+        
+    }
+    public void loadingLevel()
+    {
+        
+        //get the game's data model, which is alredy locked for us to use
+        ZombieCrushSagaDataModel data = (ZombieCrushSagaDataModel)miniGame.getDataModel();
+
+        //update the data
+        ZombieCrushSagaFileManager fileManager = miniGame.getFileManager();
+        fileManager.loadLevel(levelFile);
+        miniGame.swithToLevelScoreScreen();
+    }
+    
+}

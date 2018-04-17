@@ -1,0 +1,29 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class LevelHandler implements ActionListener
+{
+    ZombieCrushSagaMiniGame miniGame;
+    public LevelHandler(ZombieCrushSagaMiniGame initGame) 
+    {
+        miniGame = initGame;    
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) 
+    {
+        miniGame.swithToLevelScoreScreen();
+    }
+    
+}

@@ -1,0 +1,71 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import mini_game.MiniGame;
+import mini_game.MiniGameDataModel;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class MouseDrag implements MouseMotionListener, MouseListener
+{
+    private MiniGame game;
+    private int startX, startY;
+    private int endX, endY;
+    private boolean dragging = false;
+
+    public MouseDrag(ZombieCrushSagaMiniGame initGame) 
+    {
+        game = initGame;
+    }
+    
+    
+    @Override
+    public void mouseDragged(MouseEvent me) 
+    {
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent me) 
+    {
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent me) 
+    {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) 
+    {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent me) 
+    {
+        endX = me.getX();
+        endY = me.getY();
+        
+        boolean buttonRelesed = game.processButtonPress(endX, endY);
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent me) 
+    {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent me) 
+    {
+    }
+    
+}

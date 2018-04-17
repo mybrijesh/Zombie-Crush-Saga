@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    The properties in this file are specific to the zombie crush saga flavor of the game.
+-->
+<properties>
+    <property_list>    
+        <property name="GAME_TITLE_TEXT"            					value="Zombie Crush Saga"></property>
+        <property name="WINDOW_ICON"                					value="./zombiecrushsaga/BlueZombieSpecial.png"></property>
+        
+        <!-- BIG, FULL VIEWPORT BACKGROUND SCREEN IMAGES -->
+        <property name="SPLASH_SCREEN_IMAGE_NAME"  						value="./zombiecrushsaga/UIZombieCrushSagaSplashBackground.png"></property>
+		<property name="LEVEL_SCREEN_BLACK_IMAGE_NAME"					value="./zombiecrushsaga/UIZombieCrushSagaLevelScreenBlackBackground.png"></property>
+		<property name="LEVEL_MAP_IMAGE_NAME"							value="./zombiecrushsaga/UIZombieCrushSagaLevelMap.png"></property>
+        <property name="GAME_BACKGROUND_IMAGE_NAME"						value="./zombiecrushsaga/UIZombieCrushSagaGameBackground.png"></property>
+        
+        <!-- DIALOG IMAGES -->
+        <property name="WIN_DIALOG_IMAGE_NAME"             				value="./zombiecrushsaga/UIZombieCrushSagaWinDialog.png"></property>
+		<property name="LOSS_DIALOG_IMAGE_NAME"             			value="./zombiecrushsaga/UIZombieCrushSagaLossDialog.png"></property>
+        <property name="STATS_DIALOG_IMAGE_NAME"           				value="./zombiecrushsaga/UIZombieCrushSagaStatsDialog.png"></property>
+		
+		<!-- SPLASH SCREEN BUTTONS -->
+		<property name="GAMEPLAY_BUTTON_IMAGE_NAME"						value="./zombiecrushsaga/GamePlayButton.png"></property>
+		<property name="GAMEPLAY_BUTTON_MOUSE_OVER_IMAGE_NAME"			value="./zombiecrushsaga/GamePlayButtonMouseOver.png"></property>
+		<property name="GAMERESET_BUTTON_IMAGE_NAME"					value="./zombiecrushsaga/GameResetButton.png"></property>
+		<property name="GAMERESET_BUTTON_MOUSE_OVER_IMAGE_NAME"			value="./zombiecrushsaga/GameResetButtonMouseOver.png"></property>
+		<property name="GAMEQUIT_BUTTON_IMAGE_NAME"						value="./zombiecrushsaga/GameQuitButton.png"></property>
+		<property name="GAMEQUIT_BUTTON_MOUSE_OVER_IMAGE_NAME"			value="./zombiecrushsaga/GameQuitButtonMouseOver.png"></property>
+		
+		<!-- LEVEL SCREEN BUTTONS -->
+		<property name="ARROWUP_BUTTON_IMAGE_NAME"						value="./zombiecrushsaga/ArrowUpButton.png"></property>
+		<property name="ARROWUP_BUTTON_MOUSE_OVER_IMAGE_NAME"			value="./zombiecrushsaga/ArrowUpButtonMouseOver.png"></property>
+		<property name="ARROWDOWN_BUTTON_IMAGE_NAME"					value="./zombiecrushsaga/ArrowDownButton.png"></property>
+		<property name="ARROWDOWN_BUTTON_MOUSE_OVER_IMAGE_NAME"			value="./zombiecrushsaga/ArrowDownButtonMouseOver.png"></property>
+		<property name="LEVELSCREEN_QUIT_BUTTON_IMAGE_NAME"				value="./zombiecrushsaga/LevelScreenQuitButton.png"></property>
+		<property name="LEVELSCREEN_QUIT_BUTTON_MOUSE_IMAGE_NAME"		value="./zombiecrushsaga/LevelScreenQuitButtonMouseOver.png"></property>
+		
+    </property_list>
+    <property_options_list>
+        <property_options name="SPLASH_SCREEN_OPTIONS">
+<!--            <option>./zomjong/Coliseum.zom</option>
+            <option>./zomjong/TriPeak.zom</option>
+            <option>./zomjong/Turtle.zom</option>
+            <option>./zomjong/Quilt.zom</option>
+			<option>./zomjong/BrijesHarshu.zom</option>  -->
+        </property_options>
+        <property_options name="SPLASH_SCREEN_IMAGE_OPTIONS">
+			<option>./zombiecrushsaga/GamePlayButton.png</option>
+			<option>./zombiecrushsaga/GameResetButton.png</option>
+			<option>./zombiecrushsaga/GameQuitButton.png</option>
+        </property_options>
+        <property_options name="SPLASH_SCREEN_IMAGE_MOUSE_OVER_OPTIONS">
+			<option>./zombiecrushsaga/GamePlayButtonMouseOver.png</option>
+			<option>./zombiecrushsaga/GameResetButtonMouseOver.png</option>
+			<option>./zombiecrushsaga/GameQuitButtonMouseOver.png</option>
+        </property_options>
+        <!-- THERE WILL ONLY BE ONE OF EACH OF THESE
+             AND THEY CAN BE MATCHED WITH EACH OTHER -->
+        <property_options name="GREEN_ZOMBIE">
+            <option>./zombiecrushsaga/GreenZombie.png</option>
+			<option>./zombiecrushsaga/GreenZombieSpecial.png</option>
+        </property_options>
+        <property_options name="BLUE_ZOMBIE">
+            <option>./zombiecrushsaga/BlueZombie.png</option>
+			<option>./zombiecrushsaga/BlueZombieSpecial.png</option>
+        </property_options>
+		<property_options name="RED_ZOMBIE">
+            <option>./zombiecrushsaga/RedZombie.png</option>
+            <option>./zombiecrushsaga/RedZombieSpecial.png</option>
+		</property_options>
+        <property_options name="YELLOW_ZOMBIE">
+            <option>./zombiecrushsaga/YellowZombie.png</option>
+            <option>./zombiecrushsaga/YellowZombieSpecial.png</option>
+		</property_options>
+        <property_options name="PURPLE_ZOMBIE">
+            <option>./zombiecrushsaga/PurpleZombie.png</option>
+            <option>./zombiecrushsaga/PurpleZombieSpecial.png</option>
+		</property_options>
+        <property_options name="ORANGE_ZOMBIE">
+            <option>./zombiecrushsaga/OrangeZombie.png</option>
+            <option>./zombiecrushsaga/OrangeZombieSpecial.png</option>
+        </property_options>
+    </property_options_list>
+</properties>

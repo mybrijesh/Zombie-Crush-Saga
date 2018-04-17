@@ -1,0 +1,92 @@
+package zombie_crush_saga;
+
+import properties_manager.PropertiesManager;
+import xml_utilities.InvalidXMLFileFormatException;
+import zombie_crush_saga.ui.ZombieCrushSagaErrorHandler;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSaga 
+{
+   
+    public static void main(String[] args)
+    {
+       
+    }
+      /**
+     * ZombieCrushSagaPropertyType represents the types of data that will need
+     * to be extracted from XML files.
+     */
+    public enum ZombieCrushSagaPropertyType
+    {
+        /* SETUP FILE NAMES */
+        UI_PROPERTIES_FILE_NAME,
+        PROPERTIES_SCHEMA_FILE_NAME,
+        GAME_FLAVOR_FILE_NAME,
+        RECORD_FILE_NAME,
+
+        /* DIRECTORIES FOR FILE LOADING */
+        AUDIO_PATH,
+        DATA_PATH,
+        IMG_PATH,
+        
+        /* WINDOW DIMENSIONS & FRAME RATE */
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT,
+        FPS,
+        GAME_WIDTH,
+        GAME_HEIGHT,
+        GAME_LEFT_OFFSET,
+        GAME_TOP_OFFSET,
+        
+        /* GAME TEXT */
+        GAME_TITLE_TEXT,
+        EXIT_REQUEST_TEXT,
+        INVALID_XML_FILE_ERROR_TEXT,
+        ERROR_DIALOG_TITLE_TEXT,
+        
+        /* ERROR TYPES */
+        AUDIO_FILE_ERROR,
+        LOAD_LEVEL_ERROR,
+        RECORD_SAVE_ERROR,
+
+        /* IMAGE FILE NAMES */
+        WINDOW_ICON,
+        SPLASH_SCREEN_IMAGE_NAME,
+        GAME_BACKGROUND_IMAGE_NAME,
+//        BLANK_TILE_IMAGE_NAME,
+//        BLANK_TILE_SELECTED_IMAGE_NAME,
+//        NEW_BUTTON_IMAGE_NAME,
+//        NEW_BUTTON_MOUSE_OVER_IMAGE_NAME,
+//        BACK_BUTTON_IMAGE_NAME,
+//        BACK_BUTTON_MOUSE_OVER_IMAGE_NAME,
+//        TILE_COUNT_IMAGE_NAME,
+//        TIME_IMAGE_NAME,
+//        STATS_BUTTON_IMAGE_NAME,
+//        STATS_BUTTON_MOUSE_OVER_IMAGE_NAME,
+//        UNDO_BUTTON_IMAGE_NAME,
+//        UNDO_BUTTON_MOUSE_OVER_IMAGE_NAME,
+//        TILE_STACK_IMAGE_NAME,
+        
+        // AND THE DIALOGS
+        STATS_DIALOG_IMAGE_NAME,
+        WIN_DIALOG_IMAGE_NAME,
+        LOSS_DIALOG_IMAGE_NAME,
+        
+        /* TILE LOADING STUFF */
+        SPLASH_SCREEN_OPTIONS,
+        SPLASH_SCREEN_IMAGE_OPTIONS,
+        SPLASH_SCREEN_IMAGE_MOUSE_OVER_OPTIONS,
+        GREEN_ZOMBIE,
+        BLUE_ZOMBIE,
+        RED_ZOMBIE,
+        YELLOW_ZOMBIE,
+        PURPLE_ZOMBIE,
+        ORANGE_ZOMBIE,
+        
+        /* AUDIO CUES */
+    }
+}

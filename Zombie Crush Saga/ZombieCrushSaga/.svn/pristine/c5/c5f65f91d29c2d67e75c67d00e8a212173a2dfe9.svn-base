@@ -1,0 +1,1839 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.data;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import mini_game.MiniGame;
+import mini_game.MiniGameDataModel;
+import mini_game.SpriteType;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import zombie_crush_saga.ui.ZombieCrushSagaTile;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import zombie_crush_saga.event.LevelHandler;
+import zombie_crush_saga.ui.ZombieCrushSagaPanel;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaDataModel extends MiniGameDataModel
+{
+    // THIS CLASS HAS A REFERERENCE TO THE MINI GAME SO THAT IT
+    // CAN NOTIFY IT TO UPDATE THE DISPLAY WHEN THE DATA MODEL CHANGES
+    private MiniGame miniGame;
+    private ZombieCrushSagaMiniGame game;
+    private ZombieCrushSagaMove move;
+    
+    private int moveValue;
+    private int userScore;
+    private int userMove;
+    private int curve;
+    private int counter;
+    
+    private int movingTileVelocity = 20;
+    // THE LEVEL GRID REFERS TO THE LAYOUT FOR A GIVEN LEVEL, MEANING
+    // HOW MANY TILES FIT INTO EACH CELL WHEN FIRST STARTING A LEVEL
+    private int[][] levelGrid;
+    
+    // LEVEL GRID DIMENSIONS
+    private int gridColumns;
+    private int gridRows;
+    
+    // THIS STORES THE TILES ON THE GRID DURING THE GAME
+    private ArrayList<ZombieCrushSagaTile>[][] tileGrid;
+    
+    // THESE ARE THE TILES THE PLAYER HAS MATCHED
+    private ArrayList<ZombieCrushSagaTile> stackTiles;
+    private ArrayList<ZombieCrushSagaTile> RedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> BlueStackTiles;
+    private ArrayList<ZombieCrushSagaTile> GreenStackTiles;
+    private ArrayList<ZombieCrushSagaTile> YellowStackTiles;
+    private ArrayList<ZombieCrushSagaTile> PurpleStackTiles;
+    private ArrayList<ZombieCrushSagaTile> OrangeStackTiles;
+    private ArrayList<ZombieCrushSagaTile> BombStackTiles;
+    private ArrayList<ZombieCrushSagaTile> RedWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> BlueWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> GreenWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> YellowWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> OrangeWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> PurpleWrappedStackTiles;
+    private ArrayList<ZombieCrushSagaTile> TestTileStackTiles;
+    
+    // THESE ARE THE TILES THAT ARE MOVING AROUND, AND SO WE HAVE TO UPDATE
+    private ArrayList<ZombieCrushSagaTile> movingTiles;
+    
+    // THIS IS A SELECTED TILE, MEANING THE FIRST OF A PAIR THE PLAYER
+    // IS TRYING TO MATCH. THERE CAN ONLY BE ONE OF THESE AT ANY TIME
+    private ZombieCrushSagaTile selectedTileFirst;
+    private ZombieCrushSagaTile selectedTileSecond;
+    
+    // THE INITIAL LOCATION OF TILES BEFORE BEING PLACED IN THE GRID
+    private int unassignedTilesX;
+    private int unassignedTilesY;
+    
+    // THESE ARE USED FOR TIMING THE GAME
+    private GregorianCalendar startTime;
+    private GregorianCalendar endTime;
+    
+    // THE REFERENCE TO THE FILE BEING PLAYED
+    private String currentLevel;
+    
+    public ZombieCrushSagaDataModel(ZombieCrushSagaMiniGame initMiniGame) 
+    {
+        miniGame = initMiniGame;
+        game = new ZombieCrushSagaMiniGame();
+        move = new ZombieCrushSagaMove();
+        // INIT THESE FOR HOLDING MATCHED AND MOVING TILES
+        stackTiles = new ArrayList();
+        RedStackTiles = new ArrayList();
+        BlueStackTiles = new ArrayList();
+        GreenStackTiles = new ArrayList();
+        YellowStackTiles = new ArrayList();
+        PurpleStackTiles = new ArrayList();
+        OrangeStackTiles = new ArrayList();
+        BombStackTiles = new ArrayList();
+        RedWrappedStackTiles = new ArrayList();
+        BlueWrappedStackTiles = new ArrayList();
+        GreenWrappedStackTiles = new ArrayList();
+        YellowWrappedStackTiles = new ArrayList();
+        OrangeWrappedStackTiles = new ArrayList();
+        PurpleWrappedStackTiles = new ArrayList();
+        TestTileStackTiles = new ArrayList();
+        movingTiles = new ArrayList();
+        selectedTileFirst = null;
+        selectedTileSecond = null;
+        
+        userScore = 0;
+        userMove = 0;
+        moveValue = 0;
+        curve = 0;
+        counter = 0;
+    }
+    
+    public void initTiles()
+    {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String imgPath = props.getProperty(ZombieCrushSagaPropertyType.IMG_PATH);
+        int spriteTypeID = 0;
+        SpriteType sT;
+        
+        
+//        // WE'LL RENDER ALL THE TILES ON TOP OF THE BLANK TILE
+//        String blankTileFileName = props.getProperty(ZombieCrushSagaPropertyType.BLANK_TILE_IMAGE_NAME);
+//        BufferedImage blankTileImage = miniGame.loadImageWithColorKey(imgPath + blankTileFileName, COLOR_KEY);
+//        ((ZombieCrushSagaPanel)(miniGame.getCanvas())).setBlankTileImage(blankTileImage);
+//        
+//        // THIS IS A HIGHLIGHTED BLANK TILE FOR WHEN THE PLAYER SELECTS ONE
+//        String blankTileSelectedFileName = props.getProperty(ZombieCrushSagaPropertyType.BLANK_TILE_SELECTED_IMAGE_NAME);
+//        BufferedImage blankTileSelectedImage = miniGame.loadImageWithColorKey(imgPath + blankTileSelectedFileName, COLOR_KEY);
+//        ((ZombieCrushSagaPanel)(miniGame.getCanvas())).setBlankTileSelectedImage(blankTileSelectedImage);
+        
+        ArrayList<String> typeATiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_A_TYPE);
+        for(int i = 0; i< typeATiles.size();i++)
+        {
+            String imgFile = imgPath + typeATiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for (int j = 0; j <70; j++)
+            {
+                initTile(sT, TILE_A_TYPE);
+                //WE CAN USE THIS IF STATMENT TO SET AMOUNT OF TILES PER LEVEL
+//                if(stackTiles.size() >=40)
+//                    break;
+            }
+            spriteTypeID++;
+        }
+        //this will make red zombie stack for us
+        ArrayList<String> typeRedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_RED_TYPE);
+        for(int i =0 ; i<typeRedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeRedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileRed(sT, TILE_RED_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeBlueTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_BLUE_TYPE);
+        for(int i =0 ; i<typeBlueTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeBlueTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileBlue(sT, TILE_BLUE_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeGreenTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_GREEN_TYPE);
+        for(int i =0 ; i<typeGreenTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeGreenTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileGreen(sT, TILE_GREEN_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeYellowTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_YELLOW_TYPE);
+        for(int i =0 ; i<typeYellowTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeYellowTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileYellow(sT, TILE_YELLOW_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeOrangeTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_ORANGE_TYPE);
+        for(int i =0 ; i<typeOrangeTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeOrangeTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileOrange(sT, TILE_ORANGE_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typePurpleTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_PURPLE_TYPE);
+        for(int i =0 ; i<typePurpleTiles.size(); i++)
+        {
+            String imgFile = imgPath + typePurpleTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTilePurple(sT, TILE_PURPLE_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeBombTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_BOMB_TYPE);
+        for(int i =0 ; i<typeBombTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeBombTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileBomb(sT, TILE_BOMB_TYPE);
+            spriteTypeID++;
+        }
+        //this will make red zombie stack for us
+        ArrayList<String> typeRedWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_RED_WRAPPED_TYPE);
+        for(int i =0 ; i<typeRedWrappedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeRedWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileRedWrapped(sT, TILE_RED_WRAPPED_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeBlueWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_BLUE_WRAPPED_TYPE);
+        for(int i =0 ; i<typeBlueWrappedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeBlueWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileBlueWrapped(sT, TILE_BLUE_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeGreenWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_GREEN_WRAPPED_TYPE);
+        for(int i =0 ; i<typeGreenTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeGreenWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileGreenWrapped(sT, TILE_GREEN_WRAPPED_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeYellowWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_YELLOW_WRAPPED_TYPE);
+        for(int i =0 ; i<typeYellowWrappedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeYellowWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileYellowWrapped(sT, TILE_YELLOW_WRAPPED_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typeOrangeWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_ORANGE_WRAPPED_TYPE);
+        for(int i =0 ; i<typeOrangeWrappedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typeOrangeWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileOrangeWrapped(sT, TILE_ORANGE_WRAPPED_TYPE);
+            spriteTypeID++;
+        }
+        //this will make BLUE zombie stack for us
+        ArrayList<String> typePurpleWrappedTiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_PURPLE_WRAPPED_TYPE);
+        for(int i =0 ; i<typePurpleWrappedTiles.size(); i++)
+        {
+            String imgFile = imgPath + typePurpleWrappedTiles.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTilePurpleWrapped(sT, TILE_PURPLE_WRAPPED_TYPE);
+            spriteTypeID++;
+        }
+        //this is stack to create test type tiles manually
+        ArrayList<String> typeTestTile = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_TEST_TYPE);
+        for(int i =0 ; i<typeTestTile.size(); i++)
+        {
+            String imgFile = imgPath + typeTestTile.get(i);
+            sT = initTileSpriteType(imgFile, TILE_SPRITE_TYPE_PREFIX + spriteTypeID);
+            for(int j = 0; j < 40; j++)
+                initTileTestTile(sT, TILE_TEST_TYPE);
+            spriteTypeID++;
+        }
+    }
+    private void initTile(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        stackTiles.add(newTile);
+    }
+    private void initTileTestTile(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        TestTileStackTiles.add(newTile);
+    }
+    private void initTileRed(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        RedStackTiles.add(newTile);
+    }
+    private void initTileBlue(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        BlueStackTiles.add(newTile);
+    }
+    private void initTileGreen(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        GreenStackTiles.add(newTile);
+    }
+    private void initTileYellow(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        YellowStackTiles.add(newTile);
+    }
+    private void initTileOrange(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        OrangeStackTiles.add(newTile);
+    }
+    private void initTilePurple(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        PurpleStackTiles.add(newTile);
+    }
+    private void initTileRedWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        RedWrappedStackTiles.add(newTile);
+    }
+    private void initTileBlueWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        BlueWrappedStackTiles.add(newTile);
+    }
+    private void initTileGreenWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        GreenWrappedStackTiles.add(newTile);
+    }
+    private void initTileYellowWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        YellowWrappedStackTiles.add(newTile);
+    }
+    private void initTileOrangeWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        OrangeWrappedStackTiles.add(newTile);
+    }
+    private void initTilePurpleWrapped(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        PurpleWrappedStackTiles.add(newTile);
+    }
+    private void initTileBomb(SpriteType sT, String tileType) 
+    {
+        ZombieCrushSagaTile newTile = new ZombieCrushSagaTile(sT, unassignedTilesX,unassignedTilesY, 0, 0, INVISIBLE_STATE, tileType);
+        BombStackTiles.add(newTile);
+    }
+    
+    public void initLevelGrid(int[][] initGrid, int initGridColumns, int initGridRows) 
+    {
+        levelGrid = initGrid;
+        gridColumns = initGridColumns;
+        gridRows = initGridRows;
+        
+        tileGrid = new ArrayList[gridColumns][gridRows];
+        for(int i = 0; i<gridColumns;i++)
+        {
+            for(int j=0;j<gridRows;j++)
+            {
+                tileGrid[i][j] = new ArrayList();
+            }
+        }
+        enableTiles(true);
+    }
+    private SpriteType initTileSpriteType(String imgFile, String spriteTypeID) 
+    {
+        SpriteType sT = new SpriteType(spriteTypeID);
+        addSpriteType(sT);
+        
+        BufferedImage img = miniGame.loadImageWithColorKey(imgFile, COLOR_KEY);
+        Image tempImage = img.getScaledInstance(TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT, BufferedImage.SCALE_SMOOTH);
+        img = new BufferedImage(TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        img.getGraphics().drawImage(tempImage, 0, 0, null);
+        
+        sT.addState(INVISIBLE_STATE, img);
+        sT.addState(VISIBLE_STATE, img);
+        sT.addState(SELECTED_STATE, img);
+        sT.addState(INCORRECTLY_SELECTED_STATE, img);
+        return sT;
+    }
+    
+    // ACCESSOR METHODS
+
+    /**
+     * Accessor method for getting the level currently being played.
+     * 
+     * @return The level name used currently for the game screen.
+     */
+    public String getCurrentLevel() 
+    { 
+        return currentLevel; 
+    }
+
+    /**
+     * Accessor method for getting the number of tile columns in the game grid.
+     * 
+     * @return The number of columns (left to right) in the grid for the level
+     * currently loaded.
+     */
+    public int getGridColumns() 
+    { 
+        return gridColumns; 
+    }
+    
+    /**
+     * Accessor method for getting the number of tile rows in the game grid.
+     * 
+     * @return The number of rows (top to bottom) in the grid for the level
+     * currently loaded.
+     */
+    public int getGridRows() 
+    { 
+        return gridRows; 
+    }
+
+    /**
+     * Accessor method for getting the tile grid, which has all the
+     * tiles the user may select from.
+     * 
+     * @return The main 2D grid of tiles the user selects tiles from.
+     */
+    public ArrayList<ZombieCrushSagaTile>[][] getTileGrid() 
+    { 
+        return tileGrid; 
+    }
+    
+    /**
+     * Accessor method for getting the stack tiles.
+     * 
+     * @return The stack tiles, which are the tiles the matched tiles
+     * are placed in.
+     */
+    public ArrayList<ZombieCrushSagaTile> getStackTiles()
+    {
+        return stackTiles;
+    }
+
+    /**
+     * Accessor method for getting the moving tiles.
+     * 
+     * @return The moving tiles, which are the tiles currently being
+     * animated as they move around the game. 
+     */
+    public Iterator<ZombieCrushSagaTile> getMovingTiles()
+    {
+        return movingTiles.iterator();
+    }
+    public void setCurrentLevel(String initCurrentLevel) 
+    {
+        currentLevel = initCurrentLevel;
+    }
+    /*
+     * this method sets up all the scoring and stuff
+     */
+    public void setUpScoring()
+    {
+         String currentLevel = this.getCurrentLevel();
+        int lastSlash = currentLevel.lastIndexOf("/");
+        String levelName = currentLevel.substring(lastSlash+1);
+        int dot = levelName.indexOf(".");
+        levelName = levelName.substring(0,dot);
+        
+        if(levelName.equals("Level1"))
+        {
+            userScore = 0;
+            userMove = LEVEL_1_NUM_MOVES;
+            moveValue = LEVEL_1_ONE_MOVE_VALUE;
+            curve = LEVEL_1_CURVE;
+        }
+                System.out.println("UserScore: "+userScore);
+        System.out.println("UserMoves: "+userMove);
+        System.out.println("MoveValue: "+moveValue);
+    }
+    public int calculateTileXInGrid(int column, int z) 
+    {
+        int cellWidth = TILE_IMAGE_WIDTH;
+        float leftEdge = miniGame.getBoundaryLeft();
+        return (int)(leftEdge + (cellWidth * column)-(Z_TILE_OFFSET * z));
+    }
+    public int calculateTileYInGrid(int row, int z) 
+    {
+        int cellHeight = TILE_IMAGE_HEIGHT;
+        float topEdge = miniGame.getBoundaryTop();
+        return (int)(topEdge + (cellHeight * row) - (Z_TILE_OFFSET * z));
+    }
+    /*
+     * THIS METHOD CHANGES X PIXEL INTO
+     * X-COORDIANTE
+     */
+    public int calculateGridCellColumn(int x)
+    {
+        float leftEdge = miniGame.getBoundaryLeft();
+        x = (int)(x - leftEdge);
+        return x / TILE_IMAGE_WIDTH;
+    }
+    /*
+     * THIS METHOD CHANGES Y PIXEL INTO
+     * Y-COORDINATE
+     */
+    public int calculateGridCellRow(int y)
+    {
+        float topEdge = miniGame.getBoundaryTop();
+        y = (int)(y - topEdge);
+        return y / TILE_IMAGE_HEIGHT;
+    }
+    /*
+     * THIS METHOD SHOWS/HIDE THE TILES GRID
+     */
+    public void enableTiles(boolean enable) 
+    {
+        // PUT ALL THE TILES IN ONE PLACE WHERE WE CAN PROCESS THEM TOGETHER
+        moveAllTilesToStack();
+        
+        // GO THROUGH ALL OF THEM 
+        for (ZombieCrushSagaTile tile : stackTiles)
+        {
+            // AND SET THEM PROPERLY
+            if (enable)
+                tile.setState(VISIBLE_STATE);
+            else
+            {
+                tile.setState(INVISIBLE_STATE);
+//                moveAllTilesToStack();//I ADD THIS METHOD HERE
+            }
+                
+        }  
+    }
+    /*
+     * THIS METHOD MOVES ALL THE TILE TO STACK
+     */
+    public void moveAllTilesToStack() 
+    {
+        for (int i = 0; i < gridColumns; i++)
+        {
+            for (int j = 0; j < gridRows; j++)
+            {
+                ArrayList<ZombieCrushSagaTile> cellStack = tileGrid[i][j];
+                moveTiles(cellStack, stackTiles);
+            }
+        }  
+    }
+    private void moveTiles(ArrayList<ZombieCrushSagaTile> from, ArrayList<ZombieCrushSagaTile> to) 
+    {
+        // GO THROUGH ALL THE TILES, TOP TO BOTTOM
+        for (int i = from.size()-1; i >= 0; i--)
+        {
+            ZombieCrushSagaTile tile = from.remove(i);
+            
+            // ONLY ADD IT IF IT'S NOT THERE ALREADY
+            if (!to.contains(tile))
+                to.add(tile);
+        } 
+    }
+    /**
+     * This method attempts to select the selectTile argument. Note that
+     * this may be the first or second selected tile. If a tile is already
+     * selected, it will attempt to process a match/move.
+     * 
+     * @param selectTile The tile to select.
+     */
+    public void selectTile(ZombieCrushSagaTile selectTile)
+    {
+//      IF IT'S ALREADY THE SELECTED TILE, DESELECT IT
+        if (selectTile == selectedTileSecond)
+        {
+            selectedTileSecond = null;
+            selectTile.setState(VISIBLE_STATE);
+        }
+//      IF IT'S ALREADY THE SELECTED TILE, DESELECT IT
+        else if (selectTile == selectedTileFirst)
+        {
+            selectedTileFirst = selectedTileSecond;
+            selectedTileSecond = null;
+            selectTile.setState(VISIBLE_STATE);
+        }
+        else
+        {
+//          CHECK TO SEE IF NOT MORE THEN TWO TILES ARE SELECTED 
+            if((selectedTileFirst != null && selectedTileSecond != null))
+            {
+                selectedTileFirst.setState(VISIBLE_STATE);
+                selectedTileSecond.setState(VISIBLE_STATE);
+                selectedTileFirst = null;
+                selectedTileSecond = null;
+                return;
+            }
+            // IF FIRST SELECTION IS MADE
+            if (selectedTileFirst == null)
+            {
+                selectedTileFirst = selectTile;
+                selectedTileFirst.setState(SELECTED_STATE);
+            }
+            else
+            {
+                //CHEKCING TO SEE IF THE TILE USER SELECTED IS NEXT TO
+                //OUR FIRST SELECTED TILE
+                checkIfSelectTile2Possible(selectedTileFirst,selectTile);
+                
+                //MAKE SURE NEW TILES CAN BE SELECTED
+                selectedTileFirst = null;
+                selectedTileSecond = null;
+            }
+            
+        }
+    }
+    /*
+     * Checking if Second tile is next to first tile
+     */
+    public void checkIfSelectTile2Possible(ZombieCrushSagaTile selectTile1, ZombieCrushSagaTile selectTile2)
+    {
+        //CHECKING IF THE SECOND TILE SELECTED IS IN THE LEFT OF FIRST SELECTED TILE
+        if(selectTile1.getGridColumn() == selectTile2.getGridColumn()+1
+                && selectTile1.getGridRow()== selectTile2.getGridRow())
+        {
+            selectedTileSecond = selectTile2;
+            selectTile2.setState(SELECTED_STATE);
+        }
+        //CHECKING IF THE SECOND TILE SELECTED IS IN THE RIGHT OF FIRST SELECTED TILE
+        else if(selectTile1.getGridColumn() == selectTile2.getGridColumn()-1
+                && selectTile1.getGridRow() == selectTile2.getGridRow())
+        {
+            selectedTileSecond = selectTile2;
+            selectTile2.setState(SELECTED_STATE);
+        }
+        //CHECKING IF THE SECOND TILE SELECTED IS UPPER OF FIRST SELECTED TILE
+        else if(selectTile1.getGridColumn() == selectTile2.getGridColumn()
+                && selectTile1.getGridRow()-1 == selectTile2.getGridRow())
+        {
+            selectedTileSecond = selectTile2;
+            selectTile2.setState(SELECTED_STATE);
+        }
+        //CHECKING IF THE SECOND TILE SELECTED IS BELLOW OF FIRST SELECTED TILE
+        else if(selectTile1.getGridColumn() == selectTile2.getGridColumn()
+                && selectTile1.getGridRow()+1 == selectTile2.getGridRow())
+        {
+            selectedTileSecond = selectTile2;
+            selectTile2.setState(SELECTED_STATE);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null, "Wrong Move!! TRY AGAIN");
+            selectTile1.setState(VISIBLE_STATE);
+            selectTile2.setState(VISIBLE_STATE);
+            selectedTileFirst.setState(VISIBLE_STATE);
+            selectedTileFirst = null;
+            selectedTileSecond = null;
+            return;
+        }
+        //ASSIGN THE MOVE CLASS THE ORIGINAL
+        //FIRST SELECTION AND SECOND SELECTION
+        //COLUMNS AND ROWS
+        move.col1 = selectTile1.getGridColumn();
+        move.row1 = selectTile1.getGridRow();
+        move.col2 = selectTile2.getGridColumn();
+        move.row2 = selectTile2.getGridRow();
+        //MAKING THE TILES VISIBLE BACK AGAIN
+        selectTile1.setState(VISIBLE_STATE);
+        selectTile2.setState(VISIBLE_STATE);
+
+        //SWAPPING THE TILES
+        swapTiles();
+
+        //SINCE WE SWAP THE TILES THEN WE ALSO WANT TO 
+        //CHANGE OUR COLUMNS AND ROW IN MOVE CLASS
+        swapMovePosition();
+                
+        //WE HAVE A MATCH FOUND
+        try
+        {
+            matchFound();
+        }
+        catch(Exception e)
+        {
+            
+        }
+        
+        counter++;
+
+        if(counter == userMove)
+        {
+            this.endGameAsWin();
+        }
+    }
+    public boolean confirmSwapTile(int col, int row)
+    {
+        int l;
+        int r;
+        int u;
+        int d;
+        
+        l = checkLeftOfTile(col,row);
+        r = checkRightOfTile(col,row);
+        u = checkUpOfTile(col,row);
+        d = checkDownOfTile(col,row);
+        
+        if( l >= 2)
+            return true;
+        else if(r >= 2)
+            return true;
+        else if(u >= 2)
+            return true;
+        else if(d >= 2)
+            return true;
+        else
+            return false;
+    }
+    /*
+     * This method trys all kind of possible ways that tile can be matched
+     * it can be matched as
+     * 3 in row
+     * 3 in columns
+     * T shape but it can be T-shape, rotated left, rotated rigt 
+     * or flipped 
+     * 
+     * for this method we can use some pre-created method of own to figure
+     * this out
+     * 
+     * checkLeftOfTile(int col, int row)
+     * checkRightOfTile(int col, int row)
+     * checkUpOfTile(int col, int row)
+     * checkDownOfTile(int col, int row)
+     */
+    public void matchFound()
+    {
+        int col1 = move.col1;
+        int col2 = move.col2;
+        int row1 = move.row1;
+        int row2 = move.row2;
+        int Left,Right,Up,Down;
+        
+        //WE FIRST CHECK FOR FIRST TILE SELECTED
+        {
+            //WHEN WE RECIEVE THE COUNT FROM THIS METHODS
+            //IT DOES NOT INCLUDE THE ORIGINAL TILE
+            //SO IF METHOD RETURNS 2 THEN THERE ARE TOTAL OF 3 TILES MATCHING
+            //INLCUDING OUR ORIGINAL TILE SO NOW WE HAVE A MATCH
+            Left = checkLeftOfTile(col1,row1);
+            Right = checkRightOfTile(col1,row1);
+            Up = checkUpOfTile(col1, row1);
+            Down =  checkDownOfTile(col1, row1);
+            ZombieCrushSagaTile tile = tileGrid[col1][row1].get(tileGrid[col1][row1].size()-1);
+            
+            if(Left == 1 && Right == 1 && Down == 2)//CHECKS REGULAR T
+            {
+                processMove(col1,row1, Left+1,"LEFT");
+                processMove(col1+1,row1,Right,"RIGHT");
+                processMove(col1,row1+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 1 && Left == 2 && Down == 1)//CHEKCING LEFT SIDE FLIPPED T
+            {
+                processMove(col1,row1-1, Up, "UP");
+                processMove(col1,row1,Left+1,"LEFT");
+                processMove(col1,row1+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 1 && Down == 1 && Right == 2)//CHECKING RIGHT SIDE FLIPPED T
+            {
+                processMove(col1,row1-1,Up,"UP");
+                processMove(col1,row1+1,Down,"DOWN");
+                processMove(col1,row1,Right+1,"RIGHT");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Left == 1 && Right == 1)//CHECKING FOR UPSIDE DOWN T
+            {
+                processMove(col1,row1,Up+1,"UP");
+                processMove(col1-1,row1,Left,"LEFT");
+                processMove(col1+1,row1,Right,"RIGHT");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Right == 2)//CHECKING FOR L
+            {
+                processMove(col1,row1,Up+1,"UP");
+                processMove(col1+1,row1,Right,"RIGHT");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Left == 2)//CHECKING L FLIPPED TO LEFT
+            {
+                processMove(col1,row1,Up+1,"UP");
+                processMove(col1-1,row1,Left,"LEFT");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Left == 2 && Down == 2)//CHECKING L FLIPPED TO LEFT UPSIDE DOWN
+            {
+                processMove(col1,row1,Left+1,"LEFT");
+                processMove(col1,row1+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Right == 2 && Down == 2)//CHECKING L FLIPPED
+            {
+                processMove(col1,row1,Right+1,"RIGHT");
+                processMove(col1,row1+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col1,row1,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Left>= 1 && Right >=1)//checks if swaps in middle
+            {   
+                processMove(col1,row1, Left+1, "LEFT");
+                processMove(col1+1,row1, Right, "RIGHT");
+                
+                if(Left+Right+1 == 4)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if(Left+Right+1 == 5)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+                
+            }
+            else if(Up >= 1 && Down >=1)//checks if swaps in middle
+            {
+                processMove(col1,row1, Down+1,"DOWN");
+                processMove(col1,row1-1,Up,"UP");
+                if(Up+Down+1 == 4)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if(Up+Down+1 == 5)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE LEFT
+            else if(Left >= 2)
+            {
+                processMove(col1, row1, Left+1, "LEFT");
+                if(Left == 3)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Left == 4)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));                
+            }
+            //REMOVE RIGHT
+            else if(Right >= 2)
+            {
+                processMove(col1, row1, Right+1, "RIGHT");
+                if(Right == 3)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }                    
+                else if( Right == 4)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE UP
+            else if(Up >= 2)
+            {
+                processMove(col1, row1, Up+1, "UP");
+                if(Up == 3)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Up == 4)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE DOWN
+            else if(Down >= 2)
+            {
+                processMove(col1, row1, Down+1, "DOWN");
+                if(Down == 3)
+                {
+                    addFourMatchSpecialCandy(col1,row1,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Down == 4)
+                {
+                    addFiveMatchSpecialCandy(col1,row1);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+        }
+        addTiles();
+        //NOW WE CHECK FOR SECOND TILE SELECTED
+        {
+            Left = checkLeftOfTile(col2,row2);
+            Right = checkRightOfTile(col2,row2);
+            Up = checkUpOfTile(col2, row2);
+            Down =  checkDownOfTile(col2, row2);
+            ZombieCrushSagaTile tile = tileGrid[col2][row2].get(tileGrid[col2][row2].size()-1);
+            
+            if(Left == 1 && Right == 1 && Down == 2)//CHECKS REGULAR T
+            {
+                processMove(col2,row2, Left+1,"LEFT");
+                processMove(col2+1,row2,Right,"RIGHT");
+                processMove(col2,row2+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 1 && Left == 2 && Down == 1)//CHEKCING LEFT SIDE FLIPPED T
+            {
+                processMove(col2,row2-1, Up, "UP");
+                processMove(col2,row2,Left+1,"LEFT");
+                processMove(col2,row2+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 1 && Down == 1 && Right == 2)//CHECKING RIGHT SIDE FLIPPED T
+            {
+                processMove(col2,row2-1,Up,"UP");
+                processMove(col2,row2+1,Down,"DOWN");
+                processMove(col2,row2,Right+1,"RIGHT");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Left == 1 && Right == 1)
+            {
+                processMove(col2,row2,Up+1,"UP");
+                processMove(col2-1,row2,Left,"LEFT");
+                processMove(col2+1,row2,Right,"RIGHT");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Right == 2)//CHECKING FOR L
+            {
+                processMove(col2,row2,Up+1,"UP");
+                processMove(col2+1,row2,Right,"RIGHT");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Up == 2 && Left == 2)//CHECKING L FLIPPED TO LEFT
+            {
+                processMove(col2,row2,Up+1,"UP");
+                processMove(col2-1,row2,Left,"LEFT");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Left == 2 && Down == 2)//CHECKING L FLIPPED TO LEFT UPSIDE DOWN
+            {
+                processMove(col2,row2,Left+1,"LEFT");
+                processMove(col2,row2+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Right == 2 && Down == 2)//CHECKING L FLIPPED
+            {
+                processMove(col2,row2,Right+1,"RIGHT");
+                processMove(col2,row2+1,Down,"DOWN");
+                addFiveMatchWrappedCandy(col2,row2,tile);
+                userScore += ((1*moveValue)+(3*curve));
+            }
+            else if(Left>= 1 && Right >=1)//if swaps in middle
+            {
+//                addFourMatchSpecialCandy(col2,row2);
+                processMove(col2,row2, Left+1, "LEFT");
+                processMove(col2+1,row2, Right, "RIGHT");
+                if(Left+Right+1 == 4)//4 candy match
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if(Left+Right+1 == 5)//five candy match
+                {
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            else if(Up >= 1 && Down >=1)//if swaps in middle
+            {
+//                addFourMatchSpecialCandy(col2,row2);
+                processMove(col2,row2, Down+1,"DOWN");
+                processMove(col2,row2-1,Up,"UP");
+                if(Up+Down+1 == 4)
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if(Up+Down+1 == 5)
+                {
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE LEFT
+            else if(Left >= 2)
+            {
+                processMove(col2, row2, Left+1, "LEFT");
+                if(Left == 3)
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Left == 4)
+                {
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE RIGHT
+            else if(Right >= 2)
+            {
+                processMove(col2, row2, Right+1, "RIGHT");
+                if(Right == 3)
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Right == 4)
+                {
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else 
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE UP
+            else if(Up >= 2)
+            {
+                processMove(col2, row2, Up+1, "UP");
+                if(Up==3)
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if (Up==4)
+                {   
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+            //REMOVE DOWN
+            else if(Down >= 2)
+            {
+                processMove(col2, row2, Down+1, "DOWN");
+                if(Down == 3)
+                {
+                    addFourMatchSpecialCandy(col2,row2,tile);
+                    userScore += ((1*moveValue)+(1*curve));
+                }
+                else if( Down == 4)
+                {
+                    addFiveMatchSpecialCandy(col2,row2);
+                    userScore += ((1*moveValue)+(2*curve));
+                }
+                else
+                    userScore += ((1*moveValue)+(0*curve));
+            }
+        }
+    }
+    /*
+     * ADD THE WRAPPED TILE WITH EVERY T, L, AND + MATCHES
+     */
+    public void addFiveMatchWrappedCandy(int col,int row, ZombieCrushSagaTile t)
+    {
+        // TAKE THE TILE OUT OF THE STACK
+        ZombieCrushSagaTile tile = null;
+        switch (t.getSpriteType().getSpriteTypeID()) 
+        {
+            case "TILE_0":
+                tile = GreenWrappedStackTiles.remove(GreenWrappedStackTiles.size()-1);
+                break;
+            case "TILE_1":
+                tile = BlueWrappedStackTiles.remove(BlueWrappedStackTiles.size()-1);
+                break;
+            case "TILE_2":
+                tile = RedWrappedStackTiles.remove(RedWrappedStackTiles.size()-1);
+                break;
+            case "TILE_3":
+                tile = YellowWrappedStackTiles.remove(YellowWrappedStackTiles.size()-1);
+                break;
+            case "TILE_4":
+                tile = PurpleWrappedStackTiles.remove(PurpleWrappedStackTiles.size()-1);
+                break;
+            case "TILE_5":
+                tile = OrangeWrappedStackTiles.remove(OrangeWrappedStackTiles.size()-1);
+                break;
+        }
+        // PUT IT IN THE GRID
+        tileGrid[col][row].add(tile);
+        tile.setGridCell(col,row);
+
+        // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+        // OUT WHERE IT'S GOING AND GET IT MOVING
+        float x = calculateTileXInGrid(col, 0);
+        float y = calculateTileYInGrid(row, 0);
+        tile.setTarget(x, y);
+        tile.startMovingToTarget(movingTileVelocity);
+        movingTiles.add(tile);
+    }
+    /*
+     * ADD THE BOMB TILE WITH EVERY 5 MATCHES
+     */
+    public void addFiveMatchSpecialCandy(int col, int row)
+    {
+//        ArrayList<ZombieCrushSagaTile> stack = tileGrid[col][row];
+//        stack.remove(stack.size()-1);
+        ZombieCrushSagaTile tile = BombStackTiles.remove(BombStackTiles.size()-1);
+        // PUT IT IN THE GRID
+        tileGrid[col][row].add(tile);
+        tile.setGridCell(col,row);
+
+        // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+        // OUT WHERE IT'S GOING AND GET IT MOVING
+        float x = calculateTileXInGrid(col, 0);
+        float y = calculateTileYInGrid(row, 0);
+        tile.setTarget(x, y);
+        tile.startMovingToTarget(movingTileVelocity);
+        movingTiles.add(tile);
+    }
+    /*
+     * ADDS THE SPECIAL WRAP ZOMBIE FOR 4 MATCHES
+     * */
+    public void addFourMatchSpecialCandy(int col, int row, ZombieCrushSagaTile t)
+    {
+//        ArrayList<ZombieCrushSagaTile> stack = tileGrid[col][row];
+//        stack.remove(stack.size()-1);
+//        System.out.println(""+t.getSpriteType().getSpriteTypeID());
+        // TAKE THE TILE OUT OF THE STACK
+        ZombieCrushSagaTile tile = null;
+        switch (t.getSpriteType().getSpriteTypeID()) 
+        {
+            case "TILE_0":
+                tile = GreenStackTiles.remove(GreenStackTiles.size()-1);
+                break;
+            case "TILE_1":
+                tile = BlueStackTiles.remove(BlueStackTiles.size()-1);
+                break;
+            case "TILE_2":
+                tile = RedStackTiles.remove(RedStackTiles.size()-1);
+                break;
+            case "TILE_3":
+                tile = YellowStackTiles.remove(YellowStackTiles.size()-1);
+                break;
+            case "TILE_4":
+                tile = PurpleStackTiles.remove(PurpleStackTiles.size()-1);
+                break;
+            case "TILE_5":
+                tile = OrangeStackTiles.remove(OrangeStackTiles.size()-1);
+                break;
+        }
+                
+
+        // PUT IT IN THE GRID
+        tileGrid[col][row].add(tile);
+        tile.setGridCell(col,row);
+
+        // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+        // OUT WHERE IT'S GOING AND GET IT MOVING
+        float x = calculateTileXInGrid(col, 0);
+        float y = calculateTileYInGrid(row, 0);
+        tile.setTarget(x, y);
+        tile.startMovingToTarget(movingTileVelocity);
+        movingTiles.add(tile);
+        
+        
+    }
+    /*
+     * This Method swaps the zombie
+     */
+    public void swapTiles()
+    {
+        ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[move.col1][move.row1];
+        ArrayList<ZombieCrushSagaTile> stack2 = tileGrid[move.col2][move.row2];
+        ZombieCrushSagaTile tile1 = stack1.remove(stack1.size()-1);
+        ZombieCrushSagaTile tile2 = stack2.remove(stack2.size()-1);
+        //MAKING THE BOTH TILES VISIBLE
+        tile1.setState(VISIBLE_STATE);
+        tile2.setState(VISIBLE_STATE);
+        //SWAP THEM
+        tile1.setTarget(tile2.getX(), tile2.getY());
+        tile1.startMovingToTarget(movingTileVelocity);
+        tile2.setTarget(tile1.getX(), tile1.getY());
+        tile2.startMovingToTarget(movingTileVelocity);
+//        System.out.println("Tile1 X:"+tile1.getGridColumn()+" Y: "+tile1.getGridRow());
+//        System.out.println("Tile2 X:"+tile2.getGridColumn()+" Y: "+tile2.getGridRow());
+        movingTiles.add(tile1);
+        movingTiles.add(tile2);
+        
+        /*
+         * SWAPPING THE ZOMBIE ONLY CHANGES ANNIMATION
+         * NOT GRID COLUMNS AND ROW
+         * SO NOW WE SWAP THEIR COLUMNS AND ROWS
+         */
+        int tile2Col = tile2.getGridColumn();
+        int tile2Row = tile2.getGridRow();
+        tile2.setGridCell(tile1.getGridColumn(), tile1.getGridRow());
+        tile1.setGridCell(tile2Col, tile2Row);
+        
+        //ADDING BACK TO STACK
+        stack1.add(tile1);
+        stack2.add(tile2);
+        
+        //ADDING STACK BACK TO GRID
+        tileGrid[tile2.getGridColumn()][tile2.getGridRow()] = stack2;
+        tileGrid[tile1.getGridColumn()][tile1.getGridRow()] = stack1;
+        
+        //CHECKING TO SEE IF IT WAS A CORRECT SWAP
+//        if(confirmSwapTile(tile2.getGridColumn(),tile2.getGridRow())||confirmSwapTile(tile1.getGridColumn(),tile1.getGridRow()))
+//        {
+//            move.col1 = tile2.getGridColumn();
+//            move.row1 = tile2.getGridRow();
+//            move.col2 = tile1.getGridColumn();
+//            move.row2 = tile1.getGridRow();
+//            swapTiles();
+//        }
+    }
+    public void swapMovePosition()
+    {
+        int col = move.col1;
+        int row = move.row1;
+        move.col1 = move.col2;
+        move.row1 = move.row2;
+        move.col2 = col;
+        move.row2 = row;
+    }
+     /**
+     * This method updates all the necessary state information
+     * to process the move argument.
+     * 
+     * This method will get
+     * col, row of tile 
+     * x is number to tiles matched 
+     * direction is LEFT,RIGHT,UP,DOWN,UPDOWN,LEFTRIGHT
+     * 
+     * @param move The move to make. Note that a move specifies
+     * the cell locations for a match.
+     */
+    public void processMove(int col, int row, int x, String direction)
+    {
+        if((x >= 1))
+        {
+            for(int i = 0; i < x ; i++)
+            {
+                //THIS IS IF OUR MATCH IS ON LEFT
+                if(direction.equals("LEFT"))
+                {
+                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col-i][row];
+                    stack1.remove(stack1.size()-1);
+                }
+                //THIS IS IF OUR MATCH IS ON RIGHT
+                else if(direction.equals("RIGHT"))
+                {
+                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col+i][row];
+                    stack1.remove(stack1.size()-1);
+                }
+                //THIS IS IF OUR MATCH IS UP
+                else if(direction.equals("UP"))
+                {
+                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row-i];
+                    stack1.remove(stack1.size()-1);
+                }
+                //THIS IS IF OUR MATCH ID DOWN
+                else if(direction.equals("DOWN"))
+                {
+                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row+i];
+                    stack1.remove(stack1.size()-1);
+                }
+            }
+        }
+        /*
+         * from here on in else if only Left, Right, Up, Down x = 4 or 5 or more
+         * does not come here if the tile is swapping in between but...
+         * it the tile is swapping in between and either LEFT,RIGHT,UP,DOWN sends
+         * the x = 4 or more then it automatically adds Candy which we dont want.
+         */
+//        else if(x == 4)
+//        {
+////            ZombieCrushSagaTile tile1 = null;
+////            PropertiesManager props = PropertiesManager.getPropertiesManager();
+////            ArrayList<String> typeATiles = props.getPropertyOptionsList(ZombieCrushSagaPropertyType.TILE_A_TYPE);
+//
+//            ArrayList<ZombieCrushSagaTile> stack = tileGrid[col][row];
+//
+//
+//            ZombieCrushSagaTile tile1 = stack.remove(stack.size()-1);
+//            addFourMatchSpecialCandy(col,row,tile1);
+//            // TAKE THE TILE OUT OF THE RED STACK
+////            tile1 = RedStackTiles.remove(RedStackTiles.size()-1);
+////       
+////            // PUT IT IN THE GRID
+////            tileGrid[col][row].add(tile1);
+////            tile1.setGridCell(col, row);
+////
+////            // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+////            // OUT WHERE IT'S GOING AND GET IT MOVING
+////            float xPixel = calculateTileXInGrid(col, 0);
+////            float yPixel = calculateTileYInGrid(row, 0);
+////            tile1.setTarget(xPixel, yPixel);
+////            tile1.startMovingToTarget(MAX_TILE_VELOCITY);
+////            movingTiles.add(tile1);
+//            for(int i = 1;i<x;i++)
+//            {
+//                //THIS IS IF OUR MATCH IS ON LEFT
+//                if(direction.equals("LEFT"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col-i][row];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH IS ON RIGHT
+//                else if(direction.equals("RIGHT"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col+i][row];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH IS UP
+//                else if(direction.equals("UP"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row-i];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH ID DOWN
+//                else if(direction.equals("DOWN"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row+i];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//            }
+//        }
+//        else
+//        {
+//            ArrayList<ZombieCrushSagaTile> stack = tileGrid[col][row];
+//            stack.remove(stack.size()-1);
+//            addFiveMatchSpeicalCandy(col,row);
+//            for(int i = 1;i<x;i++)
+//            {
+//                //THIS IS IF OUR MATCH IS ON LEFT
+//                if(direction.equals("LEFT"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col-i][row];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH IS ON RIGHT
+//                else if(direction.equals("RIGHT"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col+i][row];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH IS UP
+//                else if(direction.equals("UP"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row-i];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//                //THIS IS IF OUR MATCH ID DOWN
+//                else if(direction.equals("DOWN"))
+//                {
+//                    ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col][row+i];
+//                    stack1.remove(stack1.size()-1);
+//                }
+//            }
+//        }
+    }
+    public int checkLeftOfTile(int col, int row)
+    {
+        int col1 = col;
+        int row1 = row;
+        int count = 0;
+        ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col1][row1];
+        ZombieCrushSagaTile tile1 = stack1.get(stack1.size()-1);
+
+        //CHECKING THE LEFT SIDE OF THE ZOMBIE FOR MATCH
+        for(int i = col1-1; i>=0 ; i--)
+        {
+            ArrayList<ZombieCrushSagaTile> stack2 = tileGrid[i][row1];
+            ZombieCrushSagaTile tile2 = stack2.get(stack2.size()-1);
+            if(tile1.match(tile2))
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+//        System.out.println("countLeft: "+count);
+        return count;
+    }
+    public int checkRightOfTile(int col, int row)
+    {
+        int col1 = col;
+        int row1 = row;
+        int count = 0;
+        
+        ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col1][row1];
+        ZombieCrushSagaTile tile1 = stack1.get(stack1.size()-1);
+        //CHECKING THE RIGHT SIDE OF THE ZOMBIE FOR MATCH
+        for(int i = col1+1; i<gridColumns ; i++)
+        {
+            
+            ArrayList<ZombieCrushSagaTile> stack2 = tileGrid[i][row1];
+            ZombieCrushSagaTile tile2 = stack2.get(stack2.size()-1);
+            if(tile1.match(tile2))
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+//        System.out.println("countRight: "+count);
+        return count;
+    }
+    public int checkUpOfTile(int col, int row)
+    {
+        int col1 = col;
+        int row1 = row;
+        int count = 0;
+        
+        ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col1][row1];
+        ZombieCrushSagaTile tile1 = stack1.get(stack1.size()-1);
+        //CHECKING THE RIGHT SIDE OF THE ZOMBIE FOR MATCH
+        for(int i = row1-1; i>=0 ; i--)
+        {
+            ArrayList<ZombieCrushSagaTile> stack2 = tileGrid[col1][i];
+            ZombieCrushSagaTile tile2 = stack2.get(stack2.size()-1);
+            if(tile1.match(tile2))
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+//        System.out.println("countUp: "+count);
+        return count;
+    }
+    public int checkDownOfTile(int col, int row) 
+    {
+        int col1 = col;
+        int row1 = row;
+        int count = 0;
+
+        ArrayList<ZombieCrushSagaTile> stack1 = tileGrid[col1][row1];
+        ZombieCrushSagaTile tile1 = stack1.get(stack1.size() - 1);
+        //CHECKING THE RIGHT SIDE OF THE ZOMBIE FOR MATCH
+        for (int i = row1 + 1; i < gridRows; i++) 
+        {
+            ArrayList<ZombieCrushSagaTile> stack2 = tileGrid[col][i];
+//            if(stack2.size() == 0)
+//            {
+////                System.out.println("col: "+ col1 + " row: "+i);
+//                JOptionPane.showMessageDialog(null,"col: "+ col1 + " row: "+i);
+//            }
+            ZombieCrushSagaTile tile2 = stack2.get(stack2.size() - 1);
+            if (tile1.match(tile2)) 
+            {
+                count++;
+            } 
+            else 
+            {
+                break;
+            }
+        }
+//        System.out.println("countDown: "+count);
+        return count;
+    }
+   /*
+     * this method drops the grid and adds new tiles
+     */
+    public void addTiles()
+    {
+        for(int i =0; i<gridColumns; i++)
+        {
+            for(int j=0;j<gridRows;j++)
+            {
+                if(tileGrid[i][j].isEmpty() && j == 0)
+                {
+                    // TAKE THE TILE OUT OF THE STACK
+                    ZombieCrushSagaTile tile = stackTiles.remove(stackTiles.size()-1);
+                    
+                    // PUT IT IN THE GRID
+                    tileGrid[i][j].add(tile);
+                    tile.setGridCell(i, j);
+                    
+                    // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+                    // OUT WHERE IT'S GOING AND GET IT MOVING
+                    float x = calculateTileXInGrid(i, 0);
+                    float y = calculateTileYInGrid(j, 0);
+                    tile.setTarget(x, y);
+                    tile.startMovingToTarget(movingTileVelocity);
+                    movingTiles.add(tile);
+//                    keepChecking();
+                }
+                else if(tileGrid[i][j].isEmpty() && j != 0)
+                {
+                    // TAKE THE TILE OUT OF THE STACK
+                    ArrayList<ZombieCrushSagaTile> stack = tileGrid[i][j-1];
+                    ZombieCrushSagaTile tile = stack.remove(stack.size()-1);
+                    
+                    // PUT IT IN THE GRID
+                    tileGrid[i][j].add(tile);
+                    tile.setGridCell(i, j);
+                    
+                    // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+                    // OUT WHERE IT'S GOING AND GET IT MOVING
+                    float x = calculateTileXInGrid(i, 0);
+                    float y = calculateTileYInGrid(j, 0);
+                    tile.setTarget(x, y);
+                    tile.startMovingToTarget(movingTileVelocity);
+                    movingTiles.add(tile);
+//                    keepChecking();
+                }
+            }
+        }
+    }
+    public void addTileOnGridForCheat(int c, int r)
+    {
+        int col = c;
+        int row = r;
+        
+        ArrayList<ZombieCrushSagaTile> stack = tileGrid[col][row];
+        stack.remove(stack.size()-1);
+        ZombieCrushSagaTile tile = TestTileStackTiles.get(TestTileStackTiles.size()-1);
+        // PUT IT IN THE GRID
+        tileGrid[col][row].add(tile);
+        tile.setGridCell(col, row);
+
+        // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+        // OUT WHERE IT'S GOING AND GET IT MOVING
+        float x = calculateTileXInGrid(col, 0);
+        float y = calculateTileYInGrid(row, 0);
+        tile.setTarget(x, y);
+        tile.startMovingToTarget(movingTileVelocity);
+        movingTiles.add(tile);
+    }
+    /*
+     * This method checks if there is any button click on grid 
+     */
+    @Override
+    public void checkMousePressOnSprites(MiniGame game, int x, int y) 
+    {
+        System.out.println("user moves: "+counter);
+        System.out.println("user score: "+userScore);
+        // FIGURE OUT THE CELL IN THE GRID
+        int col = calculateGridCellColumn(x);
+        int row = calculateGridCellRow(y);
+        if((col<0 || col > this.gridColumns)||(row<0 || row>this.gridRows))
+        {
+            JOptionPane.showMessageDialog(null, "PLEASE CLICK INSIDE THE GAME GRID");
+        }
+        else
+        {
+//            System.out.println("col: "+col);
+//            System.out.println("row: "+row);
+//          CHECK THE TOP OF THE STACK AT col, row
+            ArrayList<ZombieCrushSagaTile> tileStack = tileGrid[col][row];
+            if (tileStack.size() >= 0)
+            {
+                // GET AND TRY TO SELECT THE TOP TILE IN THAT CELL, IF THERE IS ONE
+                ZombieCrushSagaTile testTile = tileStack.get(tileStack.size()-1);
+                if (testTile.containsPoint(x, y))
+                    selectTile(testTile);            
+            }
+        }   
+    }
+    @Override
+    public void endGameAsLoss()
+    {
+        super.endGameAsLoss();
+        this.reset(miniGame);
+        counter = 0;
+    }
+   @Override
+    public void endGameAsWin()
+    {
+        //UPDATE THE GAME STATE USING THE INHERITED FUNCTIONALITY
+        super.endGameAsWin();
+               
+        //RECORD IT AS A WIN
+        ((ZombieCrushSagaMiniGame)miniGame).getPlayerRecord().addDataTOLevelRecord(currentLevel, userScore);
+        
+        this.reset(miniGame);
+        counter = 0;
+        
+        LevelHandler lh = new LevelHandler((ZombieCrushSagaMiniGame) miniGame);
+        lh.LevelHandlerSwithToLevelScoreScreen(currentLevel);
+    }
+    @Override
+    public void reset(MiniGame game) 
+    {
+        // PUT ALL THE TILES IN ONE PLACE AND MAKE THEM VISIBLE
+
+        for (ZombieCrushSagaTile tile : stackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : RedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : BlueStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : GreenStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : YellowStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : OrangeStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : PurpleStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : RedWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : BlueWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : GreenWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : YellowWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : OrangeWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : PurpleWrappedStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : BombStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+        for(ZombieCrushSagaTile tile : TestTileStackTiles)
+        {
+            tile.setX(TILE_STACK_X);
+            tile.setY(TILE_STACK_Y);
+            tile.setState(VISIBLE_STATE);
+        }
+
+        // RANDOMLY ORDER THEM
+        Collections.shuffle(stackTiles);
+        
+        // START THE CLOCK
+        startTime = new GregorianCalendar();
+        System.out.println(stackTiles.size());
+        // NOW LET'S REMOVE THEM FROM THE STACK
+        // AND PUT THE TILES IN THE GRID        
+        for (int i = 0; i < gridColumns; i++)
+        {
+            for (int j = 0; j < gridRows; j++)
+            {
+                for (int k = 0; k < levelGrid[i][j]; k++)
+                {
+                    // TAKE THE TILE OUT OF THE STACK
+                    ZombieCrushSagaTile tile = stackTiles.remove(stackTiles.size()-1);
+                    
+                    // PUT IT IN THE GRID
+                    tileGrid[i][j].add(tile);
+                    tile.setGridCell(i, j);
+                    
+                    // WE'LL ANIMATE IT GOING TO THE GRID, SO FIGURE
+                    // OUT WHERE IT'S GOING AND GET IT MOVING
+                    float x = calculateTileXInGrid(i, k);
+                    float y = calculateTileYInGrid(j, k);
+                    tile.setTarget(x, y);
+                    tile.startMovingToTarget(MAX_TILE_VELOCITY);
+                    movingTiles.add(tile);
+                }
+            }
+        }
+        // AND START ALL UPDATES
+        beginGame();
+//        keepChecking();
+    }
+
+    @Override
+    public void updateAll(MiniGame game) 
+    {
+       // MAKE SURE THIS THREAD HAS EXCLUSIVE ACCESS TO THE DATA
+        try
+        {
+            game.beginUsingData();
+                        
+            if(this.inProgress())
+            {
+                addTiles();
+            }
+
+            // WE ONLY NEED TO UPDATE AND MOVE THE MOVING TILES
+            for (int i = 0; i < movingTiles.size(); i++)
+            {
+                // GET THE NEXT TILE
+                ZombieCrushSagaTile tile = movingTiles.get(i);
+            
+                // THIS WILL UPDATE IT'S POSITION USING ITS VELOCITY
+                tile.update(game);
+                
+                // IF IT'S REACHED ITS DESTINATION, REMOVE IT
+                // FROM THE LIST OF MOVING TILES
+                if (!tile.isMovingToTarget())
+                {
+                    movingTiles.remove(tile);
+                }
+            }
+        
+            // IF THE GAME IS STILL ON, THE TIMER SHOULD CONTINUE
+            if (inProgress())
+            {
+                // KEEP THE GAME TIMER GOING IF THE GAME STILL IS
+                endTime = new GregorianCalendar();
+            }
+        }
+        finally
+        {
+            // MAKE SURE WE RELEASE THE LOCK WHETHER THERE IS
+            // AN EXCEPTION THROWN OR NOT
+            game.endUsingData();
+        }
+    }
+
+    @Override
+    public void updateDebugText(MiniGame game) 
+    {        
+
+    }
+    public void keepChecking()
+    {
+        int col1, row1;
+        int down;
+        for(int c = 0; c < gridColumns ; c++)
+        {
+            for(int r = 0; r < gridRows ; r++)
+            {
+                System.out.println("c: "+c+" r: "+r);
+                down = checkDownOfTile(c,r);
+                
+                if(down >=2)
+                {
+                    processMove(c,r,down,"DOWN");
+                }
+                addTiles();
+            }
+        }
+    }
+}

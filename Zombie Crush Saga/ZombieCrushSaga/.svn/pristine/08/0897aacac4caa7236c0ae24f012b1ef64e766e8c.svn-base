@@ -1,0 +1,47 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.data;
+
+import mini_game.MiniGame;
+import mini_game.MiniGameDataModel;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaDataModel extends MiniGameDataModel
+{
+
+    public ZombieCrushSagaDataModel(ZombieCrushSagaMiniGame aThis) 
+    {
+       
+    }
+
+    @Override
+    public void checkMousePressOnSprites(MiniGame game, int x, int y) 
+    {
+       
+    }
+
+    @Override
+    public void reset(MiniGame game) 
+    {
+        
+    }
+
+    @Override
+    public void updateAll(MiniGame game) 
+    {
+       
+    }
+
+    @Override
+    public void updateDebugText(MiniGame game) 
+    {
+     
+    }
+   
+}

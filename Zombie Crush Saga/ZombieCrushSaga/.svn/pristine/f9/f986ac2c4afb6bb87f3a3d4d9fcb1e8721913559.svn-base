@@ -1,0 +1,15 @@
+package zombie_crush_saga.event;
+
+import mini_game.MiniGame;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+import zombie_crush_saga.ui.ZombieCrushSagaPanel;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ScrollLevelScreenHandler 
+{
+    private MiniGame game;
+    private ZombieCrushSagaMiniGame miniGame;
+}

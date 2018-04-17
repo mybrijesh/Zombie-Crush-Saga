@@ -1,0 +1,27 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.data;
+
+import java.util.HashMap;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaRecord 
+{
+    private HashMap<String, ZombieCrushSagaLevelRecord> levelRecords;
+    
+    public ZombieCrushSagaRecord()
+    {
+        levelRecords = new HashMap();
+    }
+    
+    public void addZombieCrushSagaLevelRecord(String levelName, ZombieCrushSagaLevelRecord rec) 
+    {
+        levelRecords.put(levelName, rec);
+    }
+    
+}

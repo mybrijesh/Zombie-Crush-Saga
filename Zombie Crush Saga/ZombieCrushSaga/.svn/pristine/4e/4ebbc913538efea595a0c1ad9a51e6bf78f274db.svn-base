@@ -1,0 +1,39 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaKeyHandler extends KeyAdapter
+{
+    private ZombieCrushSagaMiniGame game;
+    
+    public ZombieCrushSagaKeyHandler(ZombieCrushSagaMiniGame initGame)
+    {
+        game = initGame;
+    }
+    @Override
+    public void keyPressed(KeyEvent ke)
+    {
+        ZombieCrushSagaDataModel data = (ZombieCrushSagaDataModel)game.getDataModel();
+        if(ke.getKeyCode() == KeyEvent.VK_W)
+        {
+            data.CheatKeySetUserMove();
+            data.CheatKeyClearJelly();
+            data.CheatKeySetMiniTargetScore();
+        }
+        if(ke.getKeyCode() == KeyEvent.VK_L)
+        {
+            data.CheatKeySetUserMove();
+        }
+    }
+}

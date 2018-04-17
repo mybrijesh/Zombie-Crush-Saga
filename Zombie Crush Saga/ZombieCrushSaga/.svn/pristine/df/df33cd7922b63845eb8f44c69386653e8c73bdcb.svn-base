@@ -1,0 +1,766 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.ui;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import javax.swing.JPanel;
+import mini_game.MiniGame;
+import mini_game.Sprite;
+import mini_game.SpriteType;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga;
+import zombie_crush_saga.ZombieCrushSaga.ZombieCrushSagaPropertyType;
+import zombie_crush_saga.data.ZombieCrushSagaDataModel;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.data.ZombieCrushSagaRecord;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaPanel extends JPanel
+{
+    // THIS IS ACTUALLY OUR Mahjong Solitaire APP, WE NEED THIS
+    // BECAUSE IT HAS THE GUI STUFF THAT WE NEED TO RENDER
+
+    private MiniGame game;
+    private ZombieCrushSagaMiniGame miniGame;
+    private PropertiesManager props;
+    // AND HERE IS ALL THE GAME DATA THAT WE NEED TO RENDER
+    private ZombieCrushSagaDataModel data;
+    // WE'LL USE THIS TO FORMAT SOME TEXT FOR DISPLAY PURPOSES
+    private NumberFormat numberFormatter;
+    // WE'LL USE THIS AS THE BASE IMAGE FOR RENDERING UNSELECTED TILES
+    private BufferedImage blankTileImage;
+    // WE'LL USE THIS AS THE BASE IMAGE FOR RENDERING SELECTED TILES
+    private BufferedImage blankTileSelectedImage;
+    private ZombieCrushSagaRecord record;
+
+    /**
+     * This constructor stores the game and data references, which we'll need
+     * for rendering.
+     *
+     * @param initGame the Mahjong Solitaire game that is using this panel for
+     * rendering.
+     *
+     * @param initData the Mahjong Solitaire game data.
+     */
+    ZombieCrushSagaPanel(ZombieCrushSagaMiniGame initGame, ZombieCrushSagaDataModel initData)
+    {
+
+        game = initGame;
+        miniGame = (ZombieCrushSagaMiniGame) game;
+        data = initData;
+        numberFormatter = NumberFormat.getNumberInstance();
+        numberFormatter.setMinimumFractionDigits(3);
+        numberFormatter.setMaximumFractionDigits(3);
+        record = new ZombieCrushSagaRecord();
+    }
+    // MUTATOR METHODS
+    // -setBlankTileImage
+    // -setBlankTileSelectedImage
+
+    /**
+     * This mutator method sets the base image to use for rendering tiles.
+     *
+     * @param initBlankTileImage The image to use as the base for rendering
+     * tiles.
+     */
+    public void setBlankTileImage(BufferedImage initBlankTileImage)
+    {
+        blankTileImage = initBlankTileImage;
+    }
+
+    /**
+     * This mutator method sets the base image to use for rendering selected
+     * tiles.
+     *
+     * @param initBlankTileSelectedImage The image to use as the base for
+     * rendering selected tiles.
+     */
+    public void setBlankTileSelectedImage(BufferedImage initBlankTileSelectedImage)
+    {
+        blankTileSelectedImage = initBlankTileSelectedImage;
+    }
+
+    /**
+     * This is where rendering starts. This method is called each frame, and the
+     * entire game application is rendered here with the help of a number of
+     * helper methods.
+     *
+     * @param g The Graphics context for this panel.
+     */
+    @Override
+    public void paintComponent(Graphics g)
+    {
+        try
+        {
+            // MAKE SURE WE HAVE EXCLUSIVE ACCESS TO THE GAME DATA
+            game.beginUsingData();
+
+            // CLEAR THE PANEL
+            super.paintComponent(g);
+
+            // RENDER THE BACKGROUND, WHICHEVER SCREEN WE'RE ON
+            renderBackground(g);
+
+            // AND THE BUTTONS AND DECOR
+            renderGUIControls(g);
+
+//            renderJellyTiles(g);
+            renderTileGridBackGround(g);
+            renderJellyTiles(g);
+            // AND THE TILES
+            renderTiles(g);
+
+            // AND THE DIALOGS, IF THERE ARE ANY
+            renderDialogs(g);
+
+            // RENDERING THE GRID WHERE ALL THE TILES GO CAN BE HELPFUL
+            // DURING DEBUGGIN TO BETTER UNDERSTAND HOW THEY RE LAID OUT
+            renderGrid(g);
+
+            // AND FINALLY, TEXT FOR DEBUGGING
+            renderDebuggingText(g);
+
+            renderStats(g);
+            randerScoreInGame(g);
+
+        } finally
+        {
+            // RELEASE THE LOCK
+            game.endUsingData();
+        }
+    }
+
+    public void renderBackground(Graphics g)
+    {
+        // THERE IS ONLY ONE CURRENTLY SET
+        Sprite bg = game.getGUIDecor().get(BACKGROUND_TYPE);
+        renderSprite(g, bg);
+    }
+
+    /**
+     * Renders all the GUI decor and buttons.
+     *
+     * @param g this panel's rendering context.
+     */
+    public void renderGUIControls(Graphics g)
+    {
+        // GET EACH DECOR IMAGE ONE AT A TIME
+        Collection<Sprite> decorSprites = game.getGUIDecor().values();
+        for (Sprite s : decorSprites)
+        {
+            renderSprite(g, s);
+        }
+        // AND NOW RENDER THE BUTTONS
+        Collection<Sprite> buttonSprites = game.getGUIButtons().values();
+        for (Sprite s : buttonSprites)
+        {
+            renderSprite(g, s);
+        }
+    }
+
+    public void renderDialogs(Graphics g)
+    {
+        // GET EACH DECOR IMAGE ONE AT A TIME
+        Collection<Sprite> dialogSprites = game.getGUIDialogs().values();
+        for (Sprite s : dialogSprites)
+        {
+            // RENDER THE DIALOG, NOTE IT WILL ONLY DO IT IF IT'S VISIBLE
+            renderSprite(g, s);
+        }
+    }
+
+    public void renderGrid(Graphics g)
+    {
+        // ONLY RENDER THE GRID IF WE'RE DEBUGGING
+        if (data.isDebugTextRenderingActive())
+        {
+            for (int i = 0; i < data.getGridColumns(); i++)
+            {
+                for (int j = 0; j < data.getGridRows(); j++)
+                {
+                    int x = data.calculateTileXInGrid(i, 0);
+                    int y = data.calculateTileYInGrid(j, 0);
+                    g.drawRect(x, y, TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT);
+                }
+            }
+        }
+    }
+
+    public void renderSprite(Graphics g, Sprite s)
+    {
+        // ONLY RENDER THE VISIBLE ONES
+        if (!s.getState().equals(INVISIBLE_STATE))
+        {
+            SpriteType bgST = s.getSpriteType();
+            Image img = bgST.getStateImage(s.getState());
+            g.drawImage(img, (int) s.getX(), (int) s.getY(), bgST.getWidth(), bgST.getHeight(), null);
+        }
+    }
+
+    public void renderJellyTiles(Graphics g)
+    {
+        if (miniGame.isCurrentScreenState(GAME_SCREEN_STATE))
+        {
+            int[][] newArray = new int[data.getGridColumns()][data.getGridRows()];
+            //getting all value of levelJellyGrid to newArray
+            for (int j = 0; j < data.getGridRows(); j++)
+            {
+                for (int i = 0; i < data.getGridColumns(); i++)
+                {
+                    newArray[i][j] = data.getLevelJellyGridValueAtPosition(i, j);
+                    if (newArray[i][j] == 1)
+                    {
+                        g.setColor(INCORRECTLY_SELECTED_TILE_COLOR);
+                        g.fill3DRect(data.calculateTileXInGrid(i, 0), data.calculateTileYInGrid(j, 0), TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT, true);
+                    }
+                }
+            }
+        }
+    }
+
+    public void renderTileGridBackGround(Graphics g)
+    {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String imgPath = props.getProperty(ZombieCrushSaga.ZombieCrushSagaPropertyType.IMG_PATH);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image img = toolkit.getImage(imgPath+props.getProperty(ZombieCrushSaga.ZombieCrushSagaPropertyType.BLANK_TILE_IMAGE_NAME));
+        if (miniGame.isCurrentScreenState(GAME_SCREEN_STATE))
+        {
+            int[][] newArray = new int[data.getGridColumns()][data.getGridRows()];
+            //getting all value of levelGrid to newArray
+            for (int j = 0; j < data.getGridRows(); j++)
+            {
+                for (int i = 0; i < data.getGridColumns(); i++)
+                {
+                    newArray[i][j] = data.getLevelGridValueAtPosition(i, j);
+                    if (newArray[i][j] == 1)
+                    {
+                        g.setColor(LEVEL_GRID_COLOR); 
+//                        g.drawImage(blankTileImage, i, i, this);
+                        
+                        g.drawImage(img, (int) data.calculateTileXInGrid(i, 0), (int) data.calculateTileYInGrid(j, 0),TILE_IMAGE_WIDTH,TILE_IMAGE_HEIGHT, null);
+//                        g.fillOval(data.calculateTileXInGrid(i, 0), data.calculateTileYInGrid(j, 0), TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT);
+//                        g.fillRect(data.calculateTileXInGrid(i, 0),data.calculateTileYInGrid(j, 0)
+//                                , TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT);
+                    }
+                }
+            }
+        }
+    }
+
+    public void renderTiles(Graphics g)
+    {
+        // DRAW THE TOP TILES ON THE STACK
+        if (!data.won())
+        {
+            // WE DRAW ONLY THE TOP 4 (OR 2 IF THERE ARE ONLY 2). THE REASON
+            // WE DRAW 4 IS THAT WHILE WE MOVE MATCHES TO THE STACK WE WANT
+            // TO SEE THE STACK
+            ArrayList<ZombieCrushSagaTile> stackTiles = data.getStackTiles();
+            if (stackTiles.size() > 3)
+            {
+                renderTile(g, stackTiles.get(stackTiles.size() - 3));
+                renderTile(g, stackTiles.get(stackTiles.size() - 4));
+            }
+            if (stackTiles.size() > 1)
+            {
+                renderTile(g, stackTiles.get(stackTiles.size() - 1));
+                renderTile(g, stackTiles.get(stackTiles.size() - 2));
+            }
+        }
+
+        // THEN DRAW THE GRID TILES BOTTOM TO TOP USING
+        // THE TILE'S Z TO STAGGER THEM AND GIVE THE ILLUSION
+        // OF DEPTH
+        ArrayList<ZombieCrushSagaTile>[][] tileGrid = data.getTileGrid();
+        boolean noneOnLevel = false;
+        int zIndex = 0;
+        while (!noneOnLevel)
+        {
+            int levelCounter = 0;
+            for (int i = 0; i < data.getGridColumns(); i++)
+            {
+                for (int j = 0; j < data.getGridRows(); j++)
+                {
+                    if (tileGrid[i][j].size() > zIndex)
+                    {
+                        ZombieCrushSagaTile tile = tileGrid[i][j].get(zIndex);
+                        renderTile(g, tile);
+                        levelCounter++;
+                    }
+                }
+            }
+            if (levelCounter == 0)
+            {
+                noneOnLevel = true;
+            }
+            zIndex++;
+
+            // THEN DRAW ALL THE MOVING TILES
+            Iterator<ZombieCrushSagaTile> movingTiles = data.getMovingTiles();
+            while (movingTiles.hasNext())
+            {
+                ZombieCrushSagaTile tile = movingTiles.next();
+                renderTile(g, tile);
+            }
+        }
+    }
+
+    /**
+     * Helper method for rendering the tiles that are currently moving.
+     *
+     * @param g Rendering context for this panel.
+     *
+     * @param tileToRender Tile to render to this panel.
+     */
+    public void renderTile(Graphics g, ZombieCrushSagaTile tileToRender)
+    {
+        // ONLY RENDER VISIBLE TILES
+        if (!tileToRender.getState().equals(INVISIBLE_STATE))
+        {
+            // FIRST DRAW THE BLANK TILE IMAGE
+            if (tileToRender.getState().equals(SELECTED_STATE))
+            {
+                g.drawImage(blankTileSelectedImage, (int) tileToRender.getX(), (int) tileToRender.getY(), null);
+            } else if (tileToRender.getState().equals(VISIBLE_STATE))
+            {
+                g.drawImage(blankTileImage, (int) tileToRender.getX(), (int) tileToRender.getY(), null);
+            }
+
+            // THEN THE TILE IMAGE
+            SpriteType bgST = tileToRender.getSpriteType();
+            Image img = bgST.getStateImage(tileToRender.getState());
+            g.drawImage(img, (int) tileToRender.getX() + TILE_IMAGE_OFFSET, (int) tileToRender.getY() + TILE_IMAGE_OFFSET, bgST.getWidth(), bgST.getHeight(), null);
+
+            // IF THE TILE IS SELECTED, HIGHLIGHT IT
+            if (tileToRender.getState().equals(SELECTED_STATE))
+            {
+                g.setColor(SELECTED_TILE_COLOR);
+                g.fillRoundRect((int) tileToRender.getX(), (int) tileToRender.getY(), bgST.getWidth(), bgST.getHeight(), 5, 5);
+            } else if (tileToRender.getState().equals(INCORRECTLY_SELECTED_STATE))
+            {
+                g.setColor(INCORRECTLY_SELECTED_TILE_COLOR);
+                g.fillRoundRect((int) tileToRender.getX(), (int) tileToRender.getY(), bgST.getWidth(), bgST.getHeight(), 5, 5);
+            }
+        }
+    }
+
+    public void renderDebuggingText(Graphics g)
+    {
+        // IF IT'S ACTIVATED
+        if (data.isDebugTextRenderingActive())
+        {
+            // ENABLE PROPER RENDER SETTINGS
+            g.setFont(DEBUG_TEXT_FONT);
+            g.setColor(DEBUG_TEXT_COLOR);
+
+            // GO THROUGH ALL THE DEBUG TEXT
+            Iterator<String> it = data.getDebugText().iterator();
+            int x = data.getDebugTextX();
+            int y = data.getDebugTextY();
+            while (it.hasNext())
+            {
+                // RENDER THE TEXT
+                String text = it.next();
+                g.drawString(text, x, y);
+                y += 20;
+            }
+        }
+    }
+
+    public void renderStats(Graphics g)
+    {
+        if (((ZombieCrushSagaMiniGame) game).isCurrentScreenState(LEVEL_SCORE_STATE))
+        {
+//            if (!data.won())
+            {
+                g.setFont(TEXT_DISPLAY_FONT);
+                g.setColor(Color.PINK);
+                String currentLevel = data.getCurrentLevel();
+                int lastSlash = currentLevel.lastIndexOf("/");
+                String levelName = currentLevel.substring(lastSlash + 1);
+                int dot = levelName.indexOf(".");
+                levelName = levelName.substring(0, dot);
+                ZombieCrushSagaRecord record = ((ZombieCrushSagaMiniGame) game).getPlayerRecord();
+                int highScore = record.getLevelScore(currentLevel);
+                g.drawString(levelName, 580, 92);
+                g.drawString("" + highScore, 530, 285);
+                int score = data.getScore();
+                g.drawString("" + score, 580, 480);
+                int target = getTragetScore(levelName, highScore);
+                renderStatsHelper(levelName, highScore);
+                g.setFont(TARGET_FONT);
+                g.drawString("" + target, 630, 365);
+            }
+        } else
+        {
+            game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(INVISIBLE_STATE);
+        }
+    }
+
+    public void randerScoreInGame(Graphics g)
+    {
+        if (((ZombieCrushSagaMiniGame) game).isCurrentScreenState(GAME_SCREEN_STATE))
+        {
+            if(!data.won())
+            {
+                g.setFont(TEXT_DISPLAY_FONT);
+                g.setColor(Color.PINK);
+                String currentLevel = data.getCurrentLevel();
+                int lastSlash = currentLevel.lastIndexOf("/");
+                String levelName = currentLevel.substring(lastSlash + 1);
+                int dot = levelName.indexOf(".");
+                levelName = levelName.substring(0, dot);
+                ZombieCrushSagaRecord record = ((ZombieCrushSagaMiniGame) game).getPlayerRecord();
+
+                ZombieCrushSagaDataModel data1 = (ZombieCrushSagaDataModel) game.getDataModel();
+                int score = data1.getScore();
+                int target = getTragetScore(levelName, score);
+                g.drawString("Target: " + target, 0, 100);
+                g.drawString("Moves: " + data1.getCounter(), 0, 200);
+                g.drawString("Score: " + score, 0, 300);
+//                FIRST THE ACTUAL BAR
+                int progX = (int) game.getGUIDecor().get(LEVEL_PROGRESS_BAR_TYPE).getX();
+                int progY = (int) game.getGUIDecor().get(LEVEL_PROGRESS_BAR_TYPE).getY();
+                float barHeight = PROGRESS_BAR_CORNERS.bottom - PROGRESS_BAR_CORNERS.top;
+                float barPercentage1 = (float)data.getScore()/data.getMinimumScore();
+                float barWidth = barPercentage1 * (PROGRESS_BAR_CORNERS.right - PROGRESS_BAR_CORNERS.left);
+                if(barWidth > (PROGRESS_BAR_CORNERS.right - PROGRESS_BAR_CORNERS.left)-barPercentage1)
+                {
+                    barWidth = (PROGRESS_BAR_CORNERS.right - PROGRESS_BAR_CORNERS.left-barPercentage1);
+                }
+                int barX = progX + PROGRESS_BAR_CORNERS.left;
+                int barY = progY + PROGRESS_BAR_CORNERS.top;
+                g.setColor(PROGRSS_BAR_COLOR);
+                g.fillRect(barX, barY, (int) barWidth, (int) barHeight);
+                
+            }
+        }
+    }
+
+    public int getTragetScore(String levelName, int score)
+    {
+        if (levelName.equals("Level1"))
+        {
+            if (score >= LEVEL_1_BRONZE_STAR_TARGET && score < LEVEL_1_GOLD_STAR_TARGET)
+            {
+                return LEVEL_1_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_1_GOLD_STAR_TARGET && score < LEVEL_1_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_1_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_1_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_1_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_1_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level2"))
+        {
+            if (score >= LEVEL_2_BRONZE_STAR_TARGET && score < LEVEL_2_GOLD_STAR_TARGET)
+            {
+                return LEVEL_2_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_2_GOLD_STAR_TARGET && score < LEVEL_2_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_2_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_2_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_2_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_2_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level3"))
+        {
+            if (score >= LEVEL_3_BRONZE_STAR_TARGET && score < LEVEL_3_GOLD_STAR_TARGET)
+            {
+                return LEVEL_3_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_3_GOLD_STAR_TARGET && score < LEVEL_3_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_3_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_3_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_3_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_3_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level4"))
+        {
+            if (score >= LEVEL_4_BRONZE_STAR_TARGET && score < LEVEL_4_GOLD_STAR_TARGET)
+            {
+                return LEVEL_4_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_4_GOLD_STAR_TARGET && score < LEVEL_4_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_4_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_4_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_4_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_4_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level5"))
+        {
+            if (score >= LEVEL_5_BRONZE_STAR_TARGET && score < LEVEL_5_GOLD_STAR_TARGET)
+            {
+                return LEVEL_5_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_5_GOLD_STAR_TARGET && score < LEVEL_5_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_5_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_5_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_5_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_5_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level6"))
+        {
+            if (score >= LEVEL_6_BRONZE_STAR_TARGET && score < LEVEL_6_GOLD_STAR_TARGET)
+            {
+                return LEVEL_6_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_6_GOLD_STAR_TARGET && score < LEVEL_6_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_6_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_6_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_6_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_6_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level7"))
+        {
+            if (score >= LEVEL_7_BRONZE_STAR_TARGET && score < LEVEL_7_GOLD_STAR_TARGET)
+            {
+                return LEVEL_7_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_7_GOLD_STAR_TARGET && score < LEVEL_7_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_7_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_7_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_7_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_7_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level8"))
+        {
+            if (score >= LEVEL_8_BRONZE_STAR_TARGET && score < LEVEL_8_GOLD_STAR_TARGET)
+            {
+                return LEVEL_8_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_8_GOLD_STAR_TARGET && score < LEVEL_8_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_8_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_8_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_8_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_8_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level9"))
+        {
+            if (score >= LEVEL_9_BRONZE_STAR_TARGET && score < LEVEL_9_GOLD_STAR_TARGET)
+            {
+                return LEVEL_9_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_9_GOLD_STAR_TARGET && score < LEVEL_9_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_9_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_9_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_9_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_9_BRONZE_STAR_TARGET;
+            }
+        } else if (levelName.equals("Level10"))
+        {
+            if (score >= LEVEL_10_BRONZE_STAR_TARGET && score < LEVEL_10_GOLD_STAR_TARGET)
+            {
+                return LEVEL_10_GOLD_STAR_TARGET;
+            } else if (score >= LEVEL_10_GOLD_STAR_TARGET && score < LEVEL_10_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_10_PLATINUM_STAR_TARGET;
+            } else if (score >= LEVEL_10_PLATINUM_STAR_TARGET)
+            {
+                return LEVEL_10_PLATINUM_STAR_TARGET;
+            } else
+            {
+                return LEVEL_10_BRONZE_STAR_TARGET;
+            }
+        }
+        return 0;
+    }
+
+    public void renderStatsHelper(String levelName, int score)
+    {
+        if (levelName.equals("Level1"))
+        {
+            if (score >= LEVEL_1_BRONZE_STAR_TARGET && score < LEVEL_1_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_1_GOLD_STAR_TARGET && score < LEVEL_1_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_1_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level2"))
+        {
+            if (score >= LEVEL_2_BRONZE_STAR_TARGET && score < LEVEL_2_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_2_GOLD_STAR_TARGET && score < LEVEL_2_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_2_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level3"))
+        {
+            if (score >= LEVEL_3_BRONZE_STAR_TARGET && score < LEVEL_3_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_3_GOLD_STAR_TARGET && score < LEVEL_3_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_3_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level4"))
+        {
+            if (score >= LEVEL_4_BRONZE_STAR_TARGET && score < LEVEL_4_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_4_GOLD_STAR_TARGET && score < LEVEL_4_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_4_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level5"))
+        {
+            if (score >= LEVEL_5_BRONZE_STAR_TARGET && score < LEVEL_5_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_5_GOLD_STAR_TARGET && score < LEVEL_5_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_5_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level6"))
+        {
+            if (score >= LEVEL_6_BRONZE_STAR_TARGET && score < LEVEL_6_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_6_GOLD_STAR_TARGET && score < LEVEL_6_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_6_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level7"))
+        {
+            if (score >= LEVEL_7_BRONZE_STAR_TARGET && score < LEVEL_7_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_7_GOLD_STAR_TARGET && score < LEVEL_7_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_7_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level8"))
+        {
+            if (score >= LEVEL_8_BRONZE_STAR_TARGET && score < LEVEL_8_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_8_GOLD_STAR_TARGET && score < LEVEL_8_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_8_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level9"))
+        {
+            if (score >= LEVEL_9_BRONZE_STAR_TARGET && score < LEVEL_9_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_9_GOLD_STAR_TARGET && score < LEVEL_9_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_9_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        } else if (levelName.equals("Level10"))
+        {
+            if (score >= LEVEL_10_BRONZE_STAR_TARGET && score < LEVEL_10_GOLD_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_10_GOLD_STAR_TARGET && score < LEVEL_10_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+            } else if (score >= LEVEL_10_PLATINUM_STAR_TARGET)
+            {
+                game.getGUIDialogs().get(LEVEL_SCORE_BRONZE_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_GOLD_STAR_TYPE).setState(VISIBLE_STATE);
+                game.getGUIDialogs().get(LEVEL_SCORE_PLATINUM_STAR_TYPE).setState(VISIBLE_STATE);
+            }
+        }
+    }
+}

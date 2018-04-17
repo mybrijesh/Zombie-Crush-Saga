@@ -1,0 +1,32 @@
+﻿Sorry, there was a problem downloading some files from OneDrive. Please try again.
+
+.netbeans_automatic_build - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163765&action=Download
+
+.netbeans_update_resources - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163764&action=Download
+
+.netbeans_automatic_build - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163772&action=Download
+
+.netbeans_update_resources - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163770&action=Download
+
+config.properties - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163776&action=Download
+
+.netbeans_automatic_build - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163784&action=Download
+
+.netbeans_update_resources - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163782&action=Download
+
+config.properties - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163790&action=Download
+
+.netbeans_automatic_build - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163793&action=Download
+
+.netbeans_update_resources - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163792&action=Download
+
+config.properties - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163798&action=Download
+
+.netbeans_automatic_build - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163801&action=Download
+
+.netbeans_update_resources - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163800&action=Download
+
+config.properties - https://onedrive.live.com/?cid=ee526413c358edf8&id=EE526413C358EDF8%2163884&action=Download
+
+
+

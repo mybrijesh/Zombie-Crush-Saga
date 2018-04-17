@@ -1,0 +1,299 @@
+
+package zombie_crush_saga;
+
+import java.awt.Color;
+import java.awt.Font;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class ZombieCrushSagaConstants 
+{
+    
+    // WE ONLY HAVE A LIMITIED NUMBER OF UI COMPONENT TYPES IN THIS APP
+    
+    // TILE SPRITE TYPES
+    public static final String TILE_A_TYPE = "TILE_A_TYPE";
+    public static final String TILE_B_TYPE = "TILE_B_TYPE";
+    public static final String TILE_C_TYPE = "TILE_C_TYPE";
+    public static final String TILE_RED_TYPE = "TILE_RED_TYPE";
+    public static final String TILE_BLUE_TYPE = "TILE_BLUE_TYPE";
+    public static final String TILE_GREEN_TYPE = "TILE_GREEN_TYPE";
+    public static final String TILE_YELLOW_TYPE = "TILE_YELLOW_TYPE";
+    public static final String TILE_ORANGE_TYPE = "TILE_ORANGE_TYPE";
+    public static final String TILE_PURPLE_TYPE = "TILE_PURPLE_TYPE";
+    public static final String TILE_ORANGE_WRAPPED_TYPE = "TILE_ORANGE_WRAPPED_TYPE";
+    public static final String TILE_RED_WRAPPED_TYPE = "TILE_RED_WRAPPED_TYPE";
+    public static final String TILE_BLUE_WRAPPED_TYPE = "TILE_BLUE_WRAPPED_TYPE";
+    public static final String TILE_YELLOW_WRAPPED_TYPE = "TILE_YELLOW_WRAPPED_TYPE";
+    public static final String TILE_GREEN_WRAPPED_TYPE = "TILE_GREEN_WRAPPED_TYPE";
+    public static final String TILE_PURPLE_WRAPPED_TYPE = "TILE_PURPLE_WRAPPED_TYPE";
+    public static final String TILE_BOMB_TYPE = "TILE_BOMB_TYPE";
+    public static final String TILE_TEST_TYPE = "TILE_TEST_TYPE";
+    public static final String TILE_SPRITE_TYPE_PREFIX = "TILE_";
+    
+    // EACH SCREEN HAS ITS OWN BACKGROUND TYPE
+    public static final String BACKGROUND_TYPE = "BACKGROUND_TYPE";
+    public static final String LEVEL_MAP_TYPE = "LEVEL_MAP_TYPE";
+    
+    // WE'LL USE THESE STATES TO CONTROL SWITCHING BETWEEN THE TWO
+    public static final String SPLASH_SCREEN_STATE = "SPLASH_SCREEN_STATE";
+    public static final String LEVEL_MAP_STATE = "LEVEL_MAP_STATE";
+    public static final String LEVEL_SCREEN_STATE = "LEVEL_SCREEN_STATE";
+    public static final String LEVEL_SCORE_STATE = "LEVEL_SCORE_STATE";
+    public static final String GAME_SCREEN_STATE = "GAME_SCREEN_STATE"; 
+
+    // IN-SPALSH SCREEN UI CONTROL TYPES
+    public static final String GAMEPLAY_BUTTON_TYPE = "GAMEPLAY_BUTTON_TYPE";
+    public static final String GAMERESET_BUTTON_TYPE = "GAMERESET_BUTTON_TYPE";
+    public static final String GAMEQUIT_BUTTON_TYPE = "GAMEQUIT_BUTTON_TYPE";
+    
+    /* ALL THE LEVEL MAP BUTTONS HERE INCLUDING LEVEL BUTTON AND OTHER */
+    //IN-LEVEL MAP UI CONTROL TYPES
+    public static final String SCROLLUP_BUTTON_TYPE = "ARROWUP_BUTTON_TYPE";
+    public static final String SCROLLDOWN_BUTTON_TYPE = "ARROWDOWN_BUTTON_TYPE";
+    public static final String LEVEL_MAP_QUIT_BUTTON_TYPE = "LEVELSCREEN_QUIT_BUTTON_TYPE";
+    
+    // THIS REPRESENTS THE BUTTONS ON THE LEVEL MAP SCREEN FOR LEVEL SELECTION
+    public static final String LEVEL_1_BUTTON_TYPE = "LEVEL_1_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_2_BUTTON_TYPE = "LEVEL_2_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_3_BUTTON_TYPE = "LEVEL_3_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_4_BUTTON_TYPE = "LEVEL_4_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_5_BUTTON_TYPE = "LEVEL_5_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_6_BUTTON_TYPE = "LEVEL_6_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_7_BUTTON_TYPE = "LEVEL_7_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_8_BUTTON_TYPE = "LEVEL_8_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_9_BUTTON_TYPE = "LEVEL_9_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_10_BUTTON_TYPE = "LEVEL_10_SELECT_BUTTON_TYPE";
+    public static final String LEVEL_11_BUTTON_TYPE = "LEVEL_11_SELECT_BUTTON_TYPE";
+    
+    //IN-LEVEL SCORE UI CONTROL TYPES
+    public static final String LEVEL_SCORE_QUIT_BUTTON_TYPE = "LEVEL_SCORE_QUIT_BUTTON_TYPE";
+    public static final String LEVEL_SCORE_PLAY_BUTTON_TYPE = "LEVEL_SCORE_PLAY_BUTTON_TYPE";
+    
+    //IN-GAME SCREEN UI CONTROL TYPES
+    public static final String GAME_SCREEN_LEVEL_SCORE_BUTTON_TYPE = "GAME_SCREEN_LEVEL_SCORE_BUTTON_TYPE";
+    
+    // DIALOG TYPES
+    public static final String LEVEL_SCORE_BRONZE_STAR_TYPE = "LEVEL_SCORE_BRONZE_STAR_TYPE";
+    public static final String LEVEL_SCORE_GOLD_STAR_TYPE = "LEVEL_SCORE_GOLD_STAR_TYPE";
+    public static final String LEVEL_SCORE_PLATINUM_STAR_TYPE = "LEVEL_SCORE_PLATINUM_STAR_TYPE";
+    public static final String STATS_DIALOG_TYPE = "STATS_DIALOG_TYPE";
+    public static final String WIN_DIALOG_TYPE = "WIN_DIALOG_TYPE";
+    public static final String LOSS_DIALOG_TYPE = "LOSS_DIALOG_TYPE";   
+
+    // THE TILES MAY HAVE 4 STATES:
+        // - INVISIBLE_STATE: USED WHEN ON THE SPLASH SCREEN, MEANS A TILE
+            // IS NOT DRAWN AND CANNOT BE CLICKED
+        // - VISIBLE_STATE: USED WHEN ON THE GAME SCREEN, MEANS A TILE
+            // IS VISIBLE AND CAN BE CLICKED (TO SELECT IT), BUT IS NOT CURRENTLY SELECTED
+        // - SELECTED_STATE: USED WHEN ON THE GAME SCREEN, MEANS A TILE
+            // IS VISIBLE AND CAN BE CLICKED (TO UNSELECT IT), AND IS CURRENTLY SELECTED     
+        // - NOT_AVAILABLE_STATE: USED FOR A TILE THE USER HAS CLICKED ON THAT
+            // IS NOT FREE. THIS LET'S US GIVE THE USER SOME FEEDBACK
+    public static final String INVISIBLE_STATE = "INVISIBLE_STATE";
+    public static final String VISIBLE_STATE = "VISIBLE_STATE";
+    public static final String SELECTED_STATE = "SELECTED_STATE";
+    public static final String INCORRECTLY_SELECTED_STATE = "NOT_AVAILABLE_STATE";
+    public static final String MOUSE_OVER_STATE = "MOUSE_OVER_STATE";
+
+    // THE BUTTONS MAY HAVE 2 STATES:
+        // - INVISIBLE_STATE: MEANS A BUTTON IS NOT DRAWN AND CAN'T BE CLICKED
+        // - VISIBLE_STATE: MEANS A BUTTON IS DRAWN AND CAN BE CLICKED
+        // - MOUSE_OVER_STATE: MEANS A BUTTON IS DRAWN WITH SOME HIGHLIGHTING
+            // BECAUSE THE MOUSE IS HOVERING OVER THE BUTTON
+
+    // UI CONTROL SIZE AND POSITION SETTINGS
+    
+    // OR POSITIONING THE LEVEL SELECT BUTTONS
+    public static final int SPLASH_SCREEN_BUTTON_WIDTH = 200;
+    public static final int SPLASH_SCREEN_BUTTON_MARGIN = 5;
+    public static final int SPLASH_SCREEN_BUTTON_Y = 570;
+    
+    //IN-SPLASH SCREEN UI CONTROLS POSITION SETTINGS
+    public static final int GAMEPLAY_BUTTON_X = 150;
+    public static final int GAMEPLAY_BUTTON_Y = 500;
+    public static final int GAMERESET_BUTTON_X = GAMEPLAY_BUTTON_X + 300;
+    public static final int GAMERESET_BUTTON_Y = 500;
+    public static final int GAMEQUIT_BUTTON_X = GAMERESET_BUTTON_X + 300;
+    public static final int GAMEQUIT_BUTTON_Y = 500;
+    //IN-LEVEL MAP UI CONTROLS POSITION SETTINGS
+    public static final int SCROLLUP_BUTTON_X = 1190;
+    public static final int SCROLLUP_BUTTON_Y = 100;
+    public static final int SCROLLDOWN_BUTTON_X = SCROLLUP_BUTTON_X;
+    public static final int SCROLLDOWN_BUTTON_Y = 500;
+    public static final int LEVEL_MAP_QUIT_BUTTON_X = SCROLLUP_BUTTON_X;
+    public static final int LEVEL_MAP_QUIT_BUTTON_Y = 0;
+    
+    //ALL THE LEVEL BUTTONS 1 TO 11
+    public static final int OFFSET_X = 157;
+    public static final int LEVEL_1_BUTTON_X = 28;
+    public static final int LEVEL_1_BUTTON_Y = 20;
+    public static final int LEVEL_2_BUTTON_X = 28 + OFFSET_X;
+    public static final int LEVEL_2_BUTTON_Y = 20;
+    public static final int LEVEL_3_BUTTON_X = 28 + LEVEL_2_BUTTON_X + OFFSET_X-30;
+    public static final int LEVEL_3_BUTTON_Y = 20;
+    public static final int LEVEL_4_BUTTON_X = 28 + LEVEL_3_BUTTON_X + OFFSET_X-28;
+    public static final int LEVEL_4_BUTTON_Y = 20;
+    public static final int LEVEL_5_BUTTON_X = 28 + LEVEL_4_BUTTON_X + OFFSET_X-28;
+    public static final int LEVEL_5_BUTTON_Y = 20-1;
+    public static final int LEVEL_6_BUTTON_X = 28 + LEVEL_5_BUTTON_X + OFFSET_X-29;
+    public static final int LEVEL_6_BUTTON_Y = 20-1;
+    public static final int LEVEL_7_BUTTON_X = 28 + LEVEL_6_BUTTON_X + OFFSET_X-28;
+    public static final int LEVEL_7_BUTTON_Y = 20-1;
+    public static final int LEVEL_8_BUTTON_X = 28 + LEVEL_6_BUTTON_X + OFFSET_X-26;
+    public static final int LEVEL_8_BUTTON_Y = 154;
+    public static final int LEVEL_9_BUTTON_X = 28 + LEVEL_5_BUTTON_X + OFFSET_X-30;;
+    public static final int LEVEL_9_BUTTON_Y = 153;
+    public static final int LEVEL_10_BUTTON_X = 28 + LEVEL_4_BUTTON_X + OFFSET_X-31;
+    public static final int LEVEL_10_BUTTON_Y = 153;
+    public static final int LEVEL_11_BUTTON_X = 28 + LEVEL_3_BUTTON_X + OFFSET_X-31;
+    public static final int LEVEL_11_BUTTON_Y = 152;
+    
+    //IN-LEVEL SCORE UI CONTROLS POSITION SETTINGS
+    public static final int LEVEL_SCORE_QUIT_BUTTON_X = 800;
+    public static final int LEVEL_SCORE_QUIT_BUTTON_Y = 130;
+    public static final int LEVEL_SCORE_PLAY_BUTTON_X = 570;
+    public static final int LEVEL_SCORE_PLAY_BUTTON_Y = 500;
+    //THIS IS OUR LEVEL SCORE STATS STARS
+    public static final int LEVEL_SCORE_BRONZE_STAR_X = 465;
+    public static final int LEVEL_SCORE_BRONZE_STAR_Y = 210;
+    public static final int LEVEL_SCORE_GOLD_STAR_X = 580;
+    public static final int LEVEL_SCORE_GOLD_STAR_Y = 190;
+    public static final int LEVEL_SCORE_PLATINUM_STAR_X = 700;
+    public static final int LEVEL_SCORE_PLATINUM_STAR_Y = 210;
+    
+    //IN-GAME SCREEN UI CONTROLS POSITION SETTINGS
+    public static final int GAME_SCREEN_LEVEL_SCORE_BUTTON_X = 570;
+    public static final int GAME_SCREEN_LEVEL_SCORE_BUTTON_Y = 0;
+    
+    // FOR STACKING TILES ON THE GRID
+    public static final int NUM_TILES = 144;
+    public static final int TILE_IMAGE_OFFSET = 1;
+    public static final int TILE_IMAGE_WIDTH = 55;//55Original   //75
+    public static final int TILE_IMAGE_HEIGHT = 55;//55   //75
+    public static final int Z_TILE_OFFSET = 5;
+    
+    public static final int TILE_STACK_X = 570;
+    public static final int TILE_STACK_Y = -100;
+
+    // FOR MOVING TILES AROUND
+    public static final int MAX_TILE_VELOCITY = 25;//50
+           
+    // THESE ARE USED FOR FORMATTING THE TIME OF GAME
+    public static final long MILLIS_IN_A_SECOND = 1000;
+    public static final long MILLIS_IN_A_MINUTE = 1000 * 60;
+    public static final long MILLIS_IN_AN_HOUR  = 1000 * 60 * 60;
+
+    // USED FOR DOING OUR VICTORY ANIMATION
+    public static final int WIN_PATH_NODES = 4;//4
+    public static final int WIN_PATH_TOLERANCE = 100;//100
+    public static final int WIN_PATH_COORD = 100;//100
+
+    // COLORS USED FOR RENDERING VARIOUS THINGS, INCLUDING THE
+    // COLOR KEY, WHICH REFERS TO THE COLOR TO IGNORE WHEN
+    // LOADING ART.
+    public static final Color COLOR_KEY = new Color(255, 174, 201);
+    public static final Color DEBUG_TEXT_COLOR = Color.BLACK;
+    public static final Color TEXT_DISPLAY_COLOR = new Color (10, 160, 10);
+    public static final Color SELECTED_TILE_COLOR = new Color(255,255,0,100);//255,255,0,100
+    public static final Color INCORRECTLY_SELECTED_TILE_COLOR = new Color(255, 50, 50, 100);
+    public static final Color STATS_COLOR = new Color(0, 60, 0);
+
+    // FONTS USED DURING FOR TEXTUAL GAME DISPLAYS
+    public static final Font TEXT_DISPLAY_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 48);
+    public static final Font DEBUG_TEXT_FONT = new Font(Font.MONOSPACED, Font.BOLD, 14);
+    public static final Font STATS_FONT = new Font(Font.MONOSPACED, Font.BOLD, 24);
+    public static final Font TARGET_FONT = new Font(Font.MONOSPACED, Font.BOLD, 24);
+    
+    //Color used in game 
+    //ccff33
+    //660000
+    //white
+    
+
+    /*
+     * HERE WE WLL HAVE ALL THE ACCESS THE DATA FOR LEVEL SOCRE
+     * SUCH AS TARGET FOR EACH START AND EACH LEVEL
+     */
+    //LEVEL 1
+    public static final int LEVEL_1_BRONZE_STAR_TARGET = 300;
+    public static final int LEVEL_1_GOLD_STAR_TARGET = 400;
+    public static final int LEVEL_1_PLATINUM_STAR_TARGET = 500;
+    public static final int LEVEL_1_NUM_MOVES = 6;
+    public static final int LEVEL_1_ONE_MOVE_VALUE = 100;
+    public static final int LEVEL_1_CURVE = 30;
+    
+    //LEVEL 2
+    public static final int LEVEL_2_BRONZE_STAR_TARGET = 1900;
+    public static final int LEVEL_2_GOLD_STAR_TARGET = 2100;
+    public static final int LEVEL_2_PLATINUM_STAR_TARGET = 2400;
+    public static final int LEVEL_2_NUM_MOVES = 15;
+    public static final int LEVEL_2_ONE_MOVE_VALUE = 100;
+    public static final int LEVEL_2_CURVE = 50;
+    
+    //LEVEL 3
+    public static final int LEVEL_3_BRONZE_STAR_TARGET = 4000;
+    public static final int LEVEL_3_GOLD_STAR_TARGET = 6000;
+    public static final int LEVEL_3_PLATINUM_STAR_TARGET = 8000;
+    public static final int LEVEL_3_NUM_MOVES = 18;
+    public static final int LEVEL_3_ONE_MOVE_VALUE = 200;
+    public static final int LEVEL_3_CURVE = 150;
+    
+    //LEVEL 4
+    public static final int LEVEL_4_BRONZE_STAR_TARGET = 4500;
+    public static final int LEVEL_4_GOLD_STAR_TARGET = 6000;
+    public static final int LEVEL_4_PLATINUM_STAR_TARGET = 9000;
+    public static final int LEVEL_4_NUM_MOVES = 15;
+    public static final int LEVEL_4_ONE_MOVE_VALUE = 200;
+    public static final int LEVEL_4_CURVE = 150;
+    
+    //LEVEL 5
+    public static final int LEVEL_5_BRONZE_STAR_TARGET = 5000;
+    public static final int LEVEL_5_GOLD_STAR_TARGET = 8000;
+    public static final int LEVEL_5_PLATINUM_STAR_TARGET = 12000;
+    public static final int LEVEL_5_NUM_MOVES = 20;
+    public static final int LEVEL_5_ONE_MOVE_VALUE = 200;
+    public static final int LEVEL_5_CURVE = 150;
+    
+    //LEVEL 6
+    public static final int LEVEL_6_BRONZE_STAR_TARGET = 9000;
+    public static final int LEVEL_6_GOLD_STAR_TARGET = 11000;
+    public static final int LEVEL_6_PLATINUM_STAR_TARGET = 13000;
+    public static final int LEVEL_6_NUM_MOVES = 25;
+    public static final int LEVEL_6_ONE_MOVE_VALUE = 300;
+    public static final int LEVEL_6_CURVE = 200;
+    
+    //LEVEL 7
+    public static final int LEVEL_7_BRONZE_STAR_TARGET = 60000;
+    public static final int LEVEL_7_GOLD_STAR_TARGET = 75000;
+    public static final int LEVEL_7_PLATINUM_STAR_TARGET = 85000;
+    public static final int LEVEL_7_NUM_MOVES = 50;
+    public static final int LEVEL_7_ONE_MOVE_VALUE = 800;
+    public static final int LEVEL_7_CURVE = 600;
+    
+    //LEVEL 8
+    public static final int LEVEL_8_BRONZE_STAR_TARGET = 20000;
+    public static final int LEVEL_8_GOLD_STAR_TARGET = 30000;
+    public static final int LEVEL_8_PLATINUM_STAR_TARGET = 45000;
+    public static final int LEVEL_8_NUM_MOVES = 20;
+    public static final int LEVEL_8_ONE_MOVE_VALUE = 700;
+    public static final int LEVEL_8_CURVE = 300;
+    
+    //LEVEL 9
+    public static final int LEVEL_9_BRONZE_STAR_TARGET = 22000;
+    public static final int LEVEL_9_GOLD_STAR_TARGET = 44000;
+    public static final int LEVEL_9_PLATINUM_STAR_TARGET = 66000;
+    public static final int LEVEL_9_NUM_MOVES = 25;
+    public static final int LEVEL_9_ONE_MOVE_VALUE = 800;
+    public static final int LEVEL_9_CURVE = 200;
+    
+    //LEVEL 10
+    public static final int LEVEL_10_BRONZE_STAR_TARGET = 40000;
+    public static final int LEVEL_10_GOLD_STAR_TARGET = 70000;
+    public static final int LEVEL_10_PLATINUM_STAR_TARGET = 100000;
+    public static final int LEVEL_10_NUM_MOVES = 40;
+    public static final int LEVEL_10_ONE_MOVE_VALUE = 800;
+    public static final int LEVEL_10_CURVE = 300;
+}

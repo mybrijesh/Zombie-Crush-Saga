@@ -1,0 +1,249 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package zombie_crush_saga.event;
+
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import properties_manager.PropertiesManager;
+import zombie_crush_saga.ZombieCrushSaga;
+import static zombie_crush_saga.ZombieCrushSagaConstants.*;
+import zombie_crush_saga.ui.ZombieCrushSagaMiniGame;
+
+/**
+ *
+ * @author Brijesh
+ */
+public class levelButtonShowHideHandler 
+{
+    private final ZombieCrushSagaMiniGame game;
+    private int targetScore[];
+    public levelButtonShowHideHandler(ZombieCrushSagaMiniGame initGame)
+    {
+        game = initGame;
+        targetScore = new int [10];
+        
+    }
+    public void addingTargetScoreToArray()
+    {
+        targetScore[0] = LEVEL_1_BRONZE_STAR_TARGET;
+        targetScore[1] = LEVEL_2_BRONZE_STAR_TARGET;
+        targetScore[2] = LEVEL_3_BRONZE_STAR_TARGET;
+        targetScore[3] = LEVEL_4_BRONZE_STAR_TARGET;
+        targetScore[4] = LEVEL_5_BRONZE_STAR_TARGET;
+        targetScore[5] = LEVEL_6_BRONZE_STAR_TARGET;
+        targetScore[6] = LEVEL_7_BRONZE_STAR_TARGET;
+        targetScore[7] = LEVEL_8_BRONZE_STAR_TARGET;
+        targetScore[8] = LEVEL_9_BRONZE_STAR_TARGET;
+        targetScore[9] = LEVEL_10_BRONZE_STAR_TARGET;
+    }
+    public void showLevelButtons()
+    {
+        this.hideLevelButtons();
+        addingTargetScoreToArray();
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(ZombieCrushSaga.ZombieCrushSagaPropertyType.DATA_PATH);
+        ArrayList<String> levels = props.getPropertyOptionsList(ZombieCrushSaga.ZombieCrushSagaPropertyType.LEVEL_OPTIONS);
+        int index = 0;
+        for(int i = 0; i < levels.size();i++)
+        {
+            int score = ((ZombieCrushSagaMiniGame)game).getPlayerRecord().getLevelScore(dataPath+levels.get(i));
+            if(score < targetScore[i])
+            {
+                break;
+            }
+            index ++;
+        }
+        if(index == 1)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 2)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 3)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 4)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 5)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 6)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 7)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 8)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 9)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setEnabled(true);
+        }
+        else if(index == 10)
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setEnabled(true);
+            game.getGUIButtons().get(LEVEL_11_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_11_BUTTON_TYPE).setEnabled(true);
+        }
+        else
+        {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(VISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(true);
+        }
+    }
+    public void hideLevelButtons()
+    {
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_1_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_2_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_3_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_4_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_5_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_6_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_7_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_8_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_9_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_10_BUTTON_TYPE).setEnabled(false);
+            game.getGUIButtons().get(LEVEL_11_BUTTON_TYPE).setState(INVISIBLE_STATE);
+            game.getGUIButtons().get(LEVEL_11_BUTTON_TYPE).setEnabled(false);
+    }
+}
